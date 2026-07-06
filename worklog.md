@@ -364,3 +364,26 @@ Work Log:
 
 Stage Summary:
 - Mobile-first confirmed with evidence. Fixed 768px tablet overflow (nav breakpoint md→lg). All views zero horizontal overflow at 390/768/1280. Primary touch targets ≥40px. Sticky footer works (min-h-screen flex flex-col + mt-auto). 76 sm: prefixes vs 4 md: confirms mobile-first Tailwind patterns.
+
+---
+Task ID: 11
+Agent: main (Z.ai Code) — minimal frameless detail modal
+Task: User asked to remove box frame from donut popup, make donut rotate + bigger, minimalist text, customer-facing minimal screen.
+
+Work Log:
+- Rewrote src/components/dowgnut/detail-modal.tsx as a clean, minimal, frameless customer view:
+  - DialogContent: removed border-4 + bg-cream card frame → border:none, bg lime-bright (page tone), rounded-2xl only on sm+.
+  - Donut: bigger (size-72 → size-96 on desktop, ~395px actual vs ~288px before), continuous rotate animation (24s linear infinite, verified transform rotate(121°→135°→149°) changing).
+  - Left panel: frameless — no gradient box, no lime-bg-grid behind donut. Donut floats on lime-bright.
+  - Favorite heart: moved to top-left, larger (size-12).
+  - Text minimalized: type · rating · cal in one thin uppercase line; name graffiti but clean; price single bold line (no pill); description plain; stock as small text; removed all badges/pills clutter.
+  - Qty stepper: minimal (label + buttons, no border box).
+  - Actions: one primary full-width button "Add to cart · $X.XX" (dark navy), one subtle text link "Add without opening cart". Removed separate "Buy now" button — cleaner.
+  - Reviews: minimal dividers, no card boxes around each review or the form. Inputs have transparent bg + subtle border only.
+  - Related donuts: frameless — just images + name + price, no card boxes.
+  - Close button: top-right circle, subtle.
+- Lint clean.
+- Verified via agent-browser: modal border 0px, bg transparent; donut 395×433px (bigger); rotation confirmed via live transform sampling (121°→135°→149°). Mobile 390px: no overflow.
+
+Stage Summary:
+- Detail popup is now a minimal, frameless customer screen. Donut is large and continuously rotating. All text/badges/boxes minimized to clean typography and whitespace. Box frame fully gone.
