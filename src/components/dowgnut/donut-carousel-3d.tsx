@@ -122,6 +122,10 @@ function DonutCard3D({
         filter,
         zIndex,
         transformStyle: "preserve-3d",
+        // Counter-rotate so the donut face stays flat toward the camera,
+        // undoing the parent disk's rotateX(TILT) — keeps visual size
+        // uniform (no foreshortening) like the grid cards.
+        rotateX: -TILT,
       }}
       className="absolute left-1/2 top-1/2 flex h-56 w-56 -translate-x-1/2 -translate-y-1/2 items-center justify-center sm:h-72 sm:w-72"
       aria-label={donut.name}

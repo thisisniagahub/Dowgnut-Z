@@ -35,7 +35,6 @@ export default function Home() {
       <main className="flex flex-1 flex-col">
         {view === "shop" && (
           <>
-            <HeroCarousel />
             <VideoCommercial />
             <DonutCarousel3D />
             <DonutGrid />
