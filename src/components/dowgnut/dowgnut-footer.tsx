@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Instagram, Package, ShoppingBag, Store, Twitter } from "lucide-react";
+import { Heart, Instagram, Package, Store, Twitter } from "lucide-react";
 import { useShop } from "@/store/use-shop";
 
 export function DowgnutFooter() {
@@ -21,17 +21,17 @@ export function DowgnutFooter() {
             <img
               src="/brand/dowgnut-logo-wordmark.png"
               alt="DowgNut"
-              className="h-9 w-auto bg-[var(--color-dowgnut-cream)] rounded-full px-3 py-1"
+              className="h-9 w-auto rounded-full bg-[var(--color-dowgnut-cream)] px-3 py-1"
               draggable={false}
             />
           </div>
           <p className="mt-4 max-w-xs text-sm text-white/70">
             Bold, playful, authentic donuts — freshly glazed daily and
-            delivered to your door.
+            delivered to your door across Malaysia.
           </p>
         </div>
 
-        {/* Quick links */}
+        {/* Quick links — customer-facing only */}
         <div>
           <p className="graffiti-text text-sm uppercase tracking-widest text-[var(--color-dowgnut-lime)]">
             Quick links
@@ -63,40 +63,49 @@ export function DowgnutFooter() {
             </li>
             <li>
               <button
-                onClick={() => setView("admin")}
-                className="inline-flex items-center gap-2 text-white/80 hover:text-[var(--color-dowgnut-pink-soft)]"
-              >
-                <ShoppingBag className="size-4" /> Admin
-              </button>
-            </li>
-            <li>
-              <button
                 onClick={() => setCartOpen(true)}
                 className="inline-flex items-center gap-2 text-white/80 hover:text-[var(--color-dowgnut-pink-soft)]"
               >
-                <ShoppingBag className="size-4" /> Cart
+                <Package className="size-4" /> Cart
               </button>
             </li>
           </ul>
         </div>
 
-        {/* Connect */}
+        {/* Connect + payment methods */}
         <div>
           <p className="graffiti-text text-sm uppercase tracking-widest text-[var(--color-dowgnut-lime)]">
+            We accept
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <span className="inline-flex h-8 items-center rounded-md bg-white px-2.5 text-xs font-black text-[#005EB8]">
+              Touch 'n Go
+            </span>
+            <span className="inline-flex h-8 items-center rounded-md bg-white px-2.5 text-xs font-black text-[var(--color-dowgnut-blue-dark)]">
+              DuitNow
+            </span>
+            <span className="inline-flex h-8 items-center rounded-md bg-white px-2.5 text-xs font-black text-[#EB001B]">
+              Visa
+            </span>
+            <span className="inline-flex h-8 items-center rounded-md bg-white px-2.5 text-xs font-black text-[#FF5F00]">
+              Mastercard
+            </span>
+          </div>
+          <p className="graffiti-text mt-6 text-sm uppercase tracking-widest text-[var(--color-dowgnut-lime)]">
             Connect
           </p>
           <ul className="mt-3 space-y-2 text-sm text-white/80">
             <li className="inline-flex items-center gap-2">
               <Instagram className="size-4 text-[var(--color-dowgnut-pink-soft)]" />
-              @dowgnut
+              @dowgnut.my
             </li>
             <li className="inline-flex items-center gap-2">
               <Twitter className="size-4 text-[var(--color-dowgnut-pink-soft)]" />
-              @dowgnut_hq
+              @dowgnut_my
             </li>
           </ul>
           <p className="mt-4 text-xs text-white/50">
-            123 Sugar Street, Sprinklesville, CA 90210
+            123 Jalan Sugar, Bukit Bintang, 55100 Kuala Lumpur, Malaysia
           </p>
         </div>
       </div>
@@ -104,7 +113,15 @@ export function DowgnutFooter() {
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-white/60 sm:flex-row sm:px-6">
           <p>© 2025 DowgNut — Good Vibes &amp; Good Dowg</p>
-          <p className="italic">Built with AI 🍩</p>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setView("admin")}
+              className="text-white/30 transition-colors hover:text-white/60"
+            >
+              Admin
+            </button>
+            <p className="italic">Built with AI 🍩</p>
+          </div>
         </div>
       </div>
     </footer>

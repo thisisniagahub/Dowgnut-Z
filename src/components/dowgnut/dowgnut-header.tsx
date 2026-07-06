@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, Search, ShoppingCart, Sparkles, Heart, Package, LayoutDashboard, Store, Shuffle, X } from "lucide-react";
+import { Menu, Search, ShoppingCart, Sparkles, Heart, Package, Store, Shuffle, X } from "lucide-react";
 import { useShop } from "@/store/use-shop";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,17 +16,18 @@ import {
 import { cn } from "@/lib/utils";
 
 interface NavItem {
-  key: "shop" | "swipe" | "favorites" | "orders" | "admin";
+  key: "shop" | "swipe" | "favorites" | "orders";
   label: string;
   icon: React.ReactNode;
 }
 
+// Customer-facing nav only. Admin lives in the footer (small link) so the
+// main UI stays clean for shoppers.
 const NAV: NavItem[] = [
   { key: "shop", label: "Shop", icon: <Store className="size-4" /> },
   { key: "swipe", label: "Swipe", icon: <Shuffle className="size-4" /> },
   { key: "favorites", label: "Favorites", icon: <Heart className="size-4" /> },
   { key: "orders", label: "Orders", icon: <Package className="size-4" /> },
-  { key: "admin", label: "Admin", icon: <LayoutDashboard className="size-4" /> },
 ];
 
 export function DowgnutHeader() {
