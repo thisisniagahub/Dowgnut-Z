@@ -6,6 +6,7 @@ import {
   AnimatePresence,
   useMotionValue,
   useTransform,
+  useMotionValueEvent,
   animate,
   type PanInfo,
 } from "framer-motion";
@@ -28,7 +29,7 @@ import { cn } from "@/lib/utils";
  */
 
 // Drag sensitivity: pixels of horizontal drag = 1 donut slot.
-const PX_PER_DONUT = 180;
+const PX_PER_DONUT = 140;
 
 // Roulette disk geometry.
 const TILT = 56; // degrees the disk is tilted back (0 = flat from top, 90 = vertical)
@@ -133,6 +134,58 @@ function DonutCard3D({
   );
 }
 
+/** Active donut name + actions — re-renders the instant `activeIndex` MV
+ *  crosses an integer, so name AND buttons stay in perfect sync with the
+ *  ring rotation (no state lag from the `center` state). */
+function ActiveInfo({
+  featured,
+  activeIndex,
+  onOpen,
+  onAdd,
+}: {
+  featured: Donut[];
+  activeIndex: ReturnType<typeof useTransform<number, number>>;
+  onOpen: (d: Donut) => void;
+  onAdd: (d: Donut) => void;
+}) {
+  const [idx, setIdx] = useState(0);
+  useMotionValueEvent(activeIndex, "change", (v) => {
+    const next = ((Math.round(v) % featured.length) + featured.length) % featured.length;
+    setIdx((prev) => (prev !== next ? next : prev));
+  });
+  const donut = featured[idx];
+  return (
+    <div className="flex flex-col items-center gap-2 text-center">
+      <AnimatePresence mode="wait">
+        <motion.h3
+          key={donut.id}
+          initial={{ y: 8, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -8, opacity: 0 }}
+          transition={{ duration: 0.18, ease: "easeOut" }}
+          className="graffiti-text text-2xl leading-none text-[var(--color-dowgnut-blue-dark)] sm:text-3xl"
+        >
+          {donut.name}
+        </motion.h3>
+      </AnimatePresence>
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => onOpen(donut)}
+          className="inline-flex h-10 items-center gap-2 rounded-full bg-[var(--color-dowgnut-pink)] px-5 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
+        >
+          View donut
+        </button>
+        <button
+          onClick={() => onAdd(donut)}
+          className="inline-flex h-10 items-center gap-2 rounded-full bg-[var(--color-dowgnut-blue)] px-5 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
+        >
+          <Plus className="size-4" /> Add to cart
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function DonutCarousel3D() {
   const donuts = useShop((s) => s.donuts);
   const openDetail = useShop((s) => s.openDetail);
@@ -156,10 +209,11 @@ export function DonutCarousel3D() {
   }
 
   const snapTo = (targetInt: number) => {
+    // Fast, snappy slide — higher stiffness, lower damping.
     animate(position, targetInt, {
       type: "spring",
-      stiffness: 170,
-      damping: 24,
+      stiffness: 380,
+      damping: 32,
     });
     const wrapped = ((targetInt % len) + len) % len;
     setCenter(wrapped);
@@ -168,6 +222,10 @@ export function DonutCarousel3D() {
   const go = (dir: number) => {
     snapTo(Math.round(position.get()) + dir);
   };
+
+  // Synced name — derived directly from the `position` motion value so the
+  // label updates the instant a new donut crosses center (no state lag).
+  const activeIndex = useTransform(position, (p) => ((Math.round(p) % len) + len) % len);
 
   if (len === 0) return null;
 
@@ -186,8 +244,6 @@ export function DonutCarousel3D() {
     if (delta < -len / 2) delta += len;
     snapTo(current + delta);
   };
-
-  const active = featured[center];
 
   return (
     <section
@@ -248,40 +304,20 @@ export function DonutCarousel3D() {
         </div>
       </div>
 
-      {/* Active donut label + actions */}
-      <div className="mt-3 flex flex-col items-center gap-2 text-center">
-        <AnimatePresence mode="wait">
-          <motion.h3
-            key={active.id}
-            initial={{ y: 10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -10, opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="graffiti-text text-2xl leading-none text-[var(--color-dowgnut-blue-dark)] sm:text-3xl"
-          >
-            {active.name}
-          </motion.h3>
-        </AnimatePresence>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => openDetail(active)}
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-[var(--color-dowgnut-pink)] px-5 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
-          >
-            View donut
-          </button>
-          <button
-            onClick={async () => {
-              try {
-                await addToCart(active.id, 1);
-              } catch {
-                /* toast handled elsewhere */
-              }
-            }}
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-[var(--color-dowgnut-blue)] px-5 text-sm font-bold text-white transition-transform hover:scale-105 active:scale-95"
-          >
-            <Plus className="size-4" /> Add to cart
-          </button>
-        </div>
+      {/* Active donut label + actions — name syncs live with the ring rotation */}
+      <div className="mt-3">
+        <ActiveInfo
+          featured={featured}
+          activeIndex={activeIndex}
+          onOpen={(d) => openDetail(d)}
+          onAdd={async (d) => {
+            try {
+              await addToCart(d.id, 1);
+            } catch {
+              /* toast handled elsewhere */
+            }
+          }}
+        />
       </div>
 
       {/* Dot indicators */}
