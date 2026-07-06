@@ -387,3 +387,32 @@ Work Log:
 
 Stage Summary:
 - Detail popup is now a minimal, frameless customer screen. Donut is large and continuously rotating. All text/badges/boxes minimized to clean typography and whitespace. Box frame fully gone.
+
+---
+Task ID: 12
+Agent: main (Z.ai Code) — git push + Vercel deploy prep
+Task: Push to https://github.com/thisisniagahub/Dowgnut-Z.git main branch + prepare for Vercel deploy.
+
+Work Log:
+- Vercel prep (ephemeral SQLite that works out-of-the-box on Vercel serverless):
+  - Updated src/lib/db.ts: auto-resolves DATABASE_URL to file:/tmp/dowgnut.db when process.env.VERCEL is set; disables query logging in production.
+  - Created src/lib/seed-data.ts: extracted the 21-donut catalog as a shared module (used by both the seed script and runtime auto-seed).
+  - Created src/lib/ensure-ready.ts: idempotent runtime schema-creation (CREATE TABLE IF NOT EXISTS for all 6 tables via raw DDL mirroring the Prisma schema) + auto-seed if Donut table is empty. Guarded by an in-process promise flag so it runs at most once per warm instance.
+  - Wired ensureReady() into src/app/api/donuts/route.ts GET (the main entry point) so the first request on a Vercel cold start lazily creates tables + seeds.
+  - Refactored prisma/seed.ts to import SEED_DONUTS from src/lib/seed-data.ts (removed duplicated data).
+- Vercel config:
+  - vercel.json: framework nextjs, buildCommand "bun run build", installCommand "bun install".
+  - package.json: added "postinstall": "prisma generate" (Vercel runs this after install), changed build to "prisma generate && next build" (clean, no standalone cp), kept build:standalone for self-host.
+  - .env.example: documented DATABASE_URL for local + Postgres production path.
+  - VERCEL_DEPLOY.md: full deploy guide — Option A (one-click ephemeral demo) and Option B (persistent Postgres), plus websocket-service separate-host instructions and troubleshooting.
+  - .gitignore: added /db/ (untrack runtime SQLite), !.env.example (commit the template), /verify-*.png (screenshots).
+- Untracked db/custom.db (was committed earlier; runtime data shouldn't be in repo).
+- Lint clean. Seed idempotent (0 inserted, 21 updated). API smoke tests: /api/donuts 200, /api/admin/stats 200.
+- Committed: "Prepare for Vercel deploy: ephemeral SQLite auto-migrate+seed, vercel.json, docs" (3ba4cd2).
+- Added remote origin → https://github.com/thisisniagahub/Dowgnut-Z.git.
+- BLOCKED on push: sandbox has no GitHub credentials (no GH_TOKEN, no gh CLI, no SSH keys, no credential helper). `git push` fails with "could not read Username for 'https://github.com'".
+
+Stage Summary:
+- All code committed locally (3ba4cd2) and remote configured. Push pending GitHub authentication which the sandbox cannot provide.
+- Two options for user: (1) provide a GitHub PAT so I can push via https://<token>@github.com/...; or (2) user runs `git push -u origin main` themselves locally — everything is staged and ready.
+- Vercel deploy fully prepared: import repo on vercel.com/new, no env vars needed for demo deploy, click Deploy. Postgres path documented for persistence.
