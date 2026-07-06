@@ -327,3 +327,21 @@ Work Log:
 
 Stage Summary:
 - AI Flavor Match feature fully removed (component, store action, API route, page wiring). AI Concierge and AI Donut Designer features retained.
+
+---
+Task ID: 9
+Agent: main (Z.ai Code) — remove box frame from donut cards
+Task: User asked to remove the box frame around donuts in the shop view — wants frameless donuts.
+
+Work Log:
+- Rewrote src/components/dowgnut/donut-card.tsx:
+  - Removed the shadcn `Card` wrapper entirely (was: rounded-3xl border-2 border-navy/10 bg-cream p-3 shadow-sm).
+  - Removed the lime-bright square box behind the donut image (was: rounded-2xl bg-lime-bright aspect-square container).
+  - Donut image now floats directly on the page background (size-full object-contain), with a playful hover effect (scale-110 + -rotate-3).
+  - Kept: favorite heart button (floating top-right), featured badge, name, rating + calories, price pill, add-to-cart button, stock warnings.
+  - The whole card is now a plain motion.div with role=button (no border/bg/shadow/rounded).
+- Lint clean (0 errors, 0 warnings).
+- Verified via agent-browser through gateway: first donut card computed style → border: 0px, backgroundColor: transparent, borderRadius: 0px, boxShadow: none. Box frame fully gone. Screenshot saved.
+
+Stage Summary:
+- Donut cards in the shop grid are now frameless — donuts float directly on the lime page background with no card border, background, or shadow. All interactivity (click-to-detail, favorite, add-to-cart) preserved.
