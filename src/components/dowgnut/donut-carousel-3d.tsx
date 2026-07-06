@@ -50,10 +50,11 @@ export function DonutCarousel3D() {
   const [dragging, setDragging] = useState(false);
   const dragStartX = useRef(0);
 
-  // Reset center if catalog shrinks.
-  useEffect(() => {
-    if (center >= featured.length) setCenter(0);
-  }, [featured.length, center]);
+  // Reset center if catalog shrinks (React "adjust state during render" pattern
+  // — avoids setState-in-effect lint error).
+  if (featured.length > 0 && center >= featured.length) {
+    setCenter(0);
+  }
 
   // Auto-rotate every 3.2s.
   useEffect(() => {
