@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   motion,
   AnimatePresence,
@@ -9,7 +9,7 @@ import {
   animate,
   type PanInfo,
 } from "framer-motion";
-import { Star, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useShop } from "@/store/use-shop";
 import type { Donut } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -68,17 +68,17 @@ function slot(o: number, len: number) {
 
   // Depth factor: 0 at front, 1 at back.
   const depth = (1 - Math.cos(rad)) / 2;
-  const scale = 1 - depth * 0.5;
   const blur = depth * 4.5;
   const zIndex = Math.round(20 - depth * 30);
 
   // Half-moon: only show the front semicircle (|angle| <= 90°).
-  // Donuts past 90° (back half) fade out completely.
   const inFront = Math.abs(angleDeg) <= 90;
-  const fade = inFront ? 1 : Math.max(0, 1 - (Math.abs(angleDeg) - 90) / 45);
   const opacity = inFront ? Math.max(0.5, 1 - depth * 0.4) : 0;
 
-  return { x, y, z, scale, opacity, blur, zIndex, fade };
+  // Standard size — no depth scaling (all donuts same size).
+  const scale = 1;
+
+  return { x, y, z, scale, opacity, blur, zIndex };
 }
 
 /** One donut on the roulette disk — derives ALL transforms from `position`. */
@@ -106,11 +106,6 @@ function DonutCard3D({
   const filter = useTransform(wrapped, (o) => `blur(${slot(o, len).blur}px)`);
   const zIndex = useTransform(wrapped, (o) => slot(o, len).zIndex);
 
-  // Price pill visible only when near front.
-  const pillOpacity = useTransform(wrapped, (o) =>
-    Math.max(0, 1 - Math.abs(o) * 2.2)
-  );
-
   return (
     <motion.button
       type="button"
@@ -125,31 +120,15 @@ function DonutCard3D({
         zIndex,
         transformStyle: "preserve-3d",
       }}
-      className="absolute left-1/2 top-1/2 flex h-[260px] w-[260px] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center sm:h-[300px] sm:w-[300px]"
+      className="absolute left-1/2 top-1/2 flex h-[260px] w-[260px] -translate-x-1/2 -translate-y-1/2 items-center justify-center sm:h-[300px] sm:w-[300px]"
       aria-label={donut.name}
     >
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 24, repeat: Infinity, ease: "linear" }}
-        className="relative"
-      >
-        <img
-          src={donut.imgUrl}
-          alt={donut.name}
-          className="size-48 object-contain drop-shadow-[0_14px_14px_rgba(7,51,79,0.3)] sm:size-56"
-          draggable={false}
-        />
-      </motion.div>
-
-      <motion.div
-        style={{ opacity: pillOpacity }}
-        className="pointer-events-none absolute bottom-2 inline-flex items-center gap-2 rounded-full bg-[var(--color-dowgnut-blue-dark)] px-3 py-1 text-xs font-bold text-white shadow-lg"
-      >
-        <Star className="size-3 fill-[var(--color-dowgnut-lime)] text-[var(--color-dowgnut-lime)]" />
-        {donut.rating.toFixed(1)}
-        <span className="text-white/40">·</span>
-        ${donut.price.toFixed(2)}
-      </motion.div>
+      <img
+        src={donut.imgUrl}
+        alt={donut.name}
+        className="size-48 object-contain drop-shadow-[0_14px_14px_rgba(7,51,79,0.3)] sm:size-56"
+        draggable={false}
+      />
     </motion.button>
   );
 }
@@ -169,7 +148,6 @@ export function DonutCarousel3D() {
 
   const position = useMotionValue(0);
   const [center, setCenter] = useState(0);
-  const [paused, setPaused] = useState(false);
   const [dragging, setDragging] = useState(false);
 
   if (len > 0 && center >= len) {
@@ -190,12 +168,6 @@ export function DonutCarousel3D() {
   const go = (dir: number) => {
     snapTo(Math.round(position.get()) + dir);
   };
-
-  useEffect(() => {
-    if (paused || dragging || len === 0) return;
-    const t = setInterval(() => go(1), 3600);
-    return () => clearInterval(t);
-  }, [paused, dragging, len]);
 
   if (len === 0) return null;
 
@@ -221,8 +193,6 @@ export function DonutCarousel3D() {
     <section
       className="relative mx-auto mt-8 w-full max-w-7xl px-4 sm:px-6"
       aria-label="Featured donuts — roulette carousel"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
     >
       {/* Heading */}
       <div className="mb-2 flex items-end justify-between gap-3 px-1">
@@ -235,7 +205,7 @@ export function DonutCarousel3D() {
           </h2>
         </div>
         <p className="hidden text-xs text-[var(--color-dowgnut-blue-dark)]/50 sm:block">
-          drag the wheel · tap a donut
+          drag to spin · tap a donut
         </p>
       </div>
 
