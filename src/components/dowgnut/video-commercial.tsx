@@ -82,11 +82,11 @@ export function VideoCommercial() {
           <video
             id="dowgnut-commercial-video"
             src={VIDEO_SRC}
-            poster={POSTER_SRC}
             autoPlay
-            muted={muted}
+            muted
             loop
             playsInline
+            preload="auto"
             onCanPlay={() => setVideoReady(true)}
             onClick={togglePlay}
             className="absolute inset-0 h-full w-full object-cover"
@@ -99,8 +99,8 @@ export function VideoCommercial() {
           />
         )}
 
-        {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-dowgnut-blue-dark)]/85 via-[var(--color-dowgnut-blue-dark)]/45 to-transparent" />
+        {/* Subtle gradient overlay — light so video stays visible */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-dowgnut-blue-dark)]/60 via-transparent to-transparent" />
 
         {/* Content overlay — syncs with the hero copy the user referenced */}
         <div className="relative flex h-full flex-col justify-center gap-3 p-6 sm:p-10 lg:p-14">
