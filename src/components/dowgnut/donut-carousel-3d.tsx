@@ -69,11 +69,16 @@ function slot(o: number, len: number) {
   // Depth factor: 0 at front, 1 at back.
   const depth = (1 - Math.cos(rad)) / 2;
   const scale = 1 - depth * 0.5;
-  const opacity = Math.max(0.18, 1 - depth * 0.75);
   const blur = depth * 4.5;
   const zIndex = Math.round(20 - depth * 30);
 
-  return { x, y, z, scale, opacity, blur, zIndex };
+  // Half-moon: only show the front semicircle (|angle| <= 90°).
+  // Donuts past 90° (back half) fade out completely.
+  const inFront = Math.abs(angleDeg) <= 90;
+  const fade = inFront ? 1 : Math.max(0, 1 - (Math.abs(angleDeg) - 90) / 45);
+  const opacity = inFront ? Math.max(0.5, 1 - depth * 0.4) : 0;
+
+  return { x, y, z, scale, opacity, blur, zIndex, fade };
 }
 
 /** One donut on the roulette disk — derives ALL transforms from `position`. */
