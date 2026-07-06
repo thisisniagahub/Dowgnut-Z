@@ -311,3 +311,19 @@ Work Log:
 
 Stage Summary:
 - Swipe-to-preview donut mode complete and browser-verified. Swipe ← skip · → love 💗 · ↑ cart 🛒, plus buttons. Accessible via the "Swipe" nav tab. Brand-consistent graffiti styling preserved.
+
+---
+Task ID: 8
+Agent: main (Z.ai Code) — remove AI Flavor Match feature
+Task: User asked to remove the AI Flavor Match feature.
+
+Work Log:
+- Removed import + <AIFlavorMatch /> usage from src/app/page.tsx (shop view now: Hero → FilterBar → DonutGrid).
+- Removed `aiMatch` action (interface declaration + implementation) from src/store/use-shop.ts.
+- Deleted component file src/components/dowgnut/ai-flavor-match.tsx.
+- Deleted API route src/app/api/ai/match/ (the /api/ai/match endpoint). AI Concierge and AI Designer routes remain.
+- Lint clean (0 errors, 0 warnings). No residual references to ai-flavor-match / AIFlavorMatch / aiMatch / FlavorMatch anywhere in src/.
+- Verified via agent-browser through gateway: shop view still renders hero, filter bar, and donut grid correctly; "craving"/"flavor match" text no longer present. GET / → 200, no console errors.
+
+Stage Summary:
+- AI Flavor Match feature fully removed (component, store action, API route, page wiring). AI Concierge and AI Donut Designer features retained.

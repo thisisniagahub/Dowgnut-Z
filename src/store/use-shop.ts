@@ -104,7 +104,6 @@ interface ShopState {
   setConciergeOpen: (open: boolean) => void;
   setDesignerOpen: (open: boolean) => void;
 
-  aiMatch: (craving: string) => Promise<{ donuts: Donut[]; reasoning: string }>;
   aiConcierge: (messages: ChatMessage[]) => Promise<{ reply: string; donuts: Donut[] }>;
   aiDesigner: (prompt: string) => Promise<{ imageUrl: string }>;
 }
@@ -325,12 +324,6 @@ export const useShop = create<ShopState>()(
       setConciergeOpen: (open) => set({ conciergeOpen: open }),
       setDesignerOpen: (open) => set({ designerOpen: open }),
 
-      aiMatch: async (craving) => {
-        return apiFetch<{ donuts: Donut[]; reasoning: string }>(`/api/ai/match`, {
-          method: "POST",
-          body: JSON.stringify({ craving, sessionId: get().sessionId }),
-        });
-      },
       aiConcierge: async (messages) => {
         return apiFetch<{ reply: string; donuts: Donut[] }>(`/api/ai/concierge`, {
           method: "POST",
