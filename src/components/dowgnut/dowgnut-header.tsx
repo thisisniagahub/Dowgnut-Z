@@ -70,7 +70,7 @@ export function DowgnutHeader() {
         </button>
 
         {/* Center nav (desktop) */}
-        <nav className="mx-auto hidden items-center gap-1 md:flex">
+        <nav className="mx-auto hidden items-center gap-1 lg:flex">
           {NAV.map((item) => {
             const isActive = view === item.key;
             const showCount = item.key === "favorites" && favorites.length > 0;
@@ -137,7 +137,7 @@ export function DowgnutHeader() {
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
           <SheetTrigger asChild>
             <button
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white md:hidden"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white lg:hidden"
               aria-label="Open menu"
             >
               <Menu className="size-5" />

@@ -345,3 +345,22 @@ Work Log:
 
 Stage Summary:
 - Donut cards in the shop grid are now frameless — donuts float directly on the lime page background with no card border, background, or shadow. All interactivity (click-to-detail, favorite, add-to-cart) preserved.
+
+---
+Task ID: 10
+Agent: main (Z.ai Code) — mobile-first audit & fix
+Task: User asked "ko dah buat mobile first?" — verify mobile-first implementation honestly and fix issues.
+
+Work Log:
+- Audited viewport meta: width=device-width, initialScale=1, maximumScale=5 ✓.
+- Audited responsive class usage in src/components/dowgnut: 76 sm: prefixes, 14 lg:, 4 md:, 1 xl: — confirms mobile-first (base styles for mobile, sm:/lg: enhancements).
+- Audited sticky footer mechanism: body has min-h-screen flex flex-col, footer has mt-auto ✓.
+- Tested actual rendering via agent-browser at 390 / 768 / 1280 widths.
+- FOUND ISSUE: tablet 768px had 5px horizontal overflow (scrollW:773 > clientW:768). Root cause: desktop nav (5 buttons) + AI Designer + Cart too cramped at 768px. Fix: changed nav breakpoint from md (768px) to lg (1024px) — `hidden md:flex` → `hidden lg:flex` and mobile menu `md:hidden` → `lg:hidden`. Now tablet (768-1023px) uses hamburger menu, desktop nav only at ≥1024px.
+- Re-verified after fix: 390px overflow=false ✓, 768px overflow=false ✓, 1280px overflow=false ✓. Desktop nav hidden on mobile/tablet, visible ≥1024px. Hamburger display:none on desktop ✓.
+- Verified swipe view (390px): overflow=false ✓. Checkout view (390px): overflow=false ✓.
+- Verified primary touch targets on mobile 390px: Cart 44px ✓, Hamburger 44px ✓, Add-to-cart 40px (slightly under 44 but acceptable), Favorite heart 36px (secondary action, acceptable).
+- Sticky footer verified earlier (Task 5): on short page footerTop:266, viewportH:844 — sticks to bottom correctly; on long page pushed down naturally.
+
+Stage Summary:
+- Mobile-first confirmed with evidence. Fixed 768px tablet overflow (nav breakpoint md→lg). All views zero horizontal overflow at 390/768/1280. Primary touch targets ≥40px. Sticky footer works (min-h-screen flex flex-col + mt-auto). 76 sm: prefixes vs 4 md: confirms mobile-first Tailwind patterns.
