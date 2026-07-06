@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { ensureReady } from "@/lib/ensure-ready";
 import type { AdminStats } from "@/lib/types";
 
 // GET /api/admin/stats  →  AdminStats
 export async function GET() {
   try {
+    await ensureReady();
     const [orders, orderItems, recentOrderRows] = await Promise.all([
       db.order.findMany({ include: { items: true } }),
       db.orderItem.findMany({ include: { donut: true } }),

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { ensureReady } from "@/lib/ensure-ready";
 import { serializeOrder } from "@/lib/serialize";
 
 const DELIVERY_FLAT = 3.99;
@@ -10,6 +11,7 @@ const FREE_DELIVERY_THRESHOLD = 25;
 //   clears cart, returns the created Order with items.
 export async function POST(request: Request) {
   try {
+    await ensureReady();
     const body = await request.json();
     const sessionId = String(body.sessionId ?? "").trim();
     const customerName = String(body.customerName ?? "").trim();
@@ -116,6 +118,7 @@ export async function POST(request: Request) {
 // GET /api/orders?sessionId=...  →  Order[] (newest first, with items)
 export async function GET(request: Request) {
   try {
+    await ensureReady();
     const { searchParams } = new URL(request.url);
     const sessionId = searchParams.get("sessionId") ?? "";
 

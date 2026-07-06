@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { ensureReady } from "@/lib/ensure-ready";
 import { getSessionId } from "@/lib/session";
 import { serializeCartItem } from "@/lib/serialize";
 
@@ -18,6 +19,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await ensureReady();
     const { id } = await params;
     const sessionId = getSessionId(request);
     const body = await request.json();
@@ -53,6 +55,7 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await ensureReady();
     const { id } = await params;
     const sessionId = getSessionId(request);
 

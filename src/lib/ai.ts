@@ -5,6 +5,27 @@ import ZAI from "z-ai-web-dev-sdk";
 import { db } from "@/lib/db";
 import { parseTags } from "@/lib/serialize";
 
+/**
+ * Returns a ZAI client. On Vercel (where the .z-ai-config file is absent),
+ * builds the config from environment variables. Locally, falls back to the
+ * SDK's file-based ZAI.create() which reads /etc/.z-ai-config or ~/.z-ai-config.
+ */
+export async function getZai(): Promise<InstanceType<typeof ZAI>> {
+  const envConfig = {
+    baseUrl: process.env.ZAI_BASE_URL,
+    apiKey: process.env.ZAI_API_KEY,
+    token: process.env.ZAI_TOKEN,
+    userId: process.env.ZAI_USER_ID,
+    chatId: process.env.ZAI_CHAT_ID,
+  };
+  if (envConfig.baseUrl && envConfig.apiKey) {
+    // Use env-var config (Vercel production)
+    return new ZAI(envConfig as any);
+  }
+  // Local dev — read from .z-ai-config file
+  return ZAI.create();
+}
+
 // Pull the donut catalog as a compact JSON list for the system prompt.
 export async function getCatalogForPrompt() {
   const donuts = await db.donut.findMany({
@@ -26,7 +47,7 @@ export async function getCatalogForPrompt() {
 export async function callChat(
   messages: { role: "system" | "user" | "assistant"; content: string }[]
 ): Promise<string> {
-  const zai = await ZAI.create();
+  const zai = await getZai();
 
   let text = "";
   try {

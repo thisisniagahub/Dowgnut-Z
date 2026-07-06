@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { ensureReady } from "@/lib/ensure-ready";
 import { serializeOrder } from "@/lib/serialize";
 
 const VALID_STATUSES = new Set([
@@ -15,6 +16,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await ensureReady();
     const { id } = await params;
     const body = await request.json();
     const status = String(body.status ?? "").trim();

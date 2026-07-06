@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { ensureReady } from "@/lib/ensure-ready";
 import { getSessionId } from "@/lib/session";
 import { serializeReview } from "@/lib/serialize";
 
@@ -10,6 +11,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await ensureReady();
     const { id } = await params;
     const body = await request.json();
     const author = String(body.author ?? "").trim();

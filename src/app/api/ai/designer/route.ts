@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
-import ZAI from "z-ai-web-dev-sdk";
+import { ensureReady } from "@/lib/ensure-ready";
+import { getZai } from "@/lib/ai";
 
 // POST /api/ai/designer  { prompt: string }
 // Returns { imageUrl: string }  where imageUrl is a data URI (data:image/png;base64,...)
 export async function POST(request: Request) {
   try {
+    await ensureReady();
     const body = await request.json();
     const prompt = String(body.prompt ?? "").trim();
     if (!prompt) {
@@ -17,7 +19,7 @@ export async function POST(request: Request) {
     const stylePrefix =
       "vibrant graffiti-style donut illustration, bold colors, neon lime background, drip details, product photography style, centered, ";
 
-    const zai = await ZAI.create();
+    const zai = await getZai();
     const response = await zai.images.generations.create({
       prompt: stylePrefix + prompt,
       size: "1024x1024",

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { ensureReady } from "@/lib/ensure-ready";
 import { getSessionId } from "@/lib/session";
 import { serializeFavorite } from "@/lib/serialize";
 
@@ -15,6 +16,7 @@ async function fetchFavorites(sessionId: string) {
 // GET /api/favorites  →  Favorite[]
 export async function GET(request: Request) {
   try {
+    await ensureReady();
     const sessionId = getSessionId(request);
     return NextResponse.json(await fetchFavorites(sessionId));
   } catch (err) {
@@ -29,6 +31,7 @@ export async function GET(request: Request) {
 // POST /api/favorites  { donutId }  →  Favorite[]  (ignore duplicates)
 export async function POST(request: Request) {
   try {
+    await ensureReady();
     const sessionId = getSessionId(request);
     const body = await request.json();
     const donutId = String(body.donutId ?? "");

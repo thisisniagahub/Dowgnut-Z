@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { ensureReady } from "@/lib/ensure-ready";
 import { serializeDonut, serializeReview } from "@/lib/serialize";
 
 // GET /api/donuts/[id]  →  { donut, reviews }
@@ -8,6 +9,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    await ensureReady();
     const { id } = await params;
     const donut = await db.donut.findUnique({ where: { id } });
     if (!donut) {

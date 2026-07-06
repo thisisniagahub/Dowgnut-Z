@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { ensureReady } from "@/lib/ensure-ready";
 import type { ChatMessage, Donut } from "@/lib/types";
 import {
   getCatalogForPrompt,
@@ -12,6 +13,7 @@ import { serializeDonut } from "@/lib/serialize";
 // Returns { reply: string, donuts: Donut[] }
 export async function POST(request: Request) {
   try {
+    await ensureReady();
     const body = await request.json();
     const incoming = Array.isArray(body.messages) ? body.messages : [];
 

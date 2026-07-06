@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { ensureReady } from "@/lib/ensure-ready";
 import { getSessionId } from "@/lib/session";
 import { serializeCartItem } from "@/lib/serialize";
 
@@ -15,6 +16,7 @@ async function fetchCart(sessionId: string) {
 // GET /api/cart  →  CartItem[] (for the calling session)
 export async function GET(request: Request) {
   try {
+    await ensureReady();
     const sessionId = getSessionId(request);
     return NextResponse.json(await fetchCart(sessionId));
   } catch (err) {
@@ -29,6 +31,7 @@ export async function GET(request: Request) {
 // POST /api/cart  { donutId, quantity? }  →  CartItem[] (upsert, increment if exists)
 export async function POST(request: Request) {
   try {
+    await ensureReady();
     const sessionId = getSessionId(request);
     const body = await request.json();
     const donutId = String(body.donutId ?? "");
