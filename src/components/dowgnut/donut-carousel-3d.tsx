@@ -15,64 +15,24 @@ import type { Donut } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 /**
- * DonutCarousel3D — a rigid 3D coverflow carousel.
+ * DonutCarousel3D — a tilted roulette-disk carousel.
  *
- * All donuts are "stuck to one board" (a rotating cylinder in 3D space).
- * A single shared motion value `position` drives every donut's transform,
- * so when you swipe, the whole ring rotates together in perfect sync —
- * no independent springing per card. Swipe/drag live-tracks the finger;
- * on release it snaps to the nearest donut.
+ * Donuts sit evenly spaced around a CIRCULAR DISK that is tilted back
+ * (rotateX) like a roulette wheel viewed at an angle. Each donut faces
+ * the camera (counter-rotated to stay upright & readable). Spinning the
+ * disk orbits the donuts around the center — the front (bottom) donut
+ * is the active/selected one.
+ *
+ * A single shared motion value `position` (in donut-slot units) drives
+ * every donut's transform, so the whole disk rotates as one rigid piece.
  */
 
-// Pixels of horizontal drag = 1 donut slot.
-const PX_PER_DONUT = 230;
+// Drag sensitivity: pixels of horizontal drag = 1 donut slot.
+const PX_PER_DONUT = 180;
 
-/** Continuous 3D slot transforms for a (possibly fractional) offset. */
-function slot(o: number) {
-  const a = Math.abs(o);
-  const s = Math.sign(o);
-
-  // x — sideways position
-  let x: number;
-  if (a <= 1) x = 220 * a;
-  else if (a <= 2) x = 220 + (a - 1) * 160;
-  else x = 380 + (a - 2) * 110;
-  x = s * x;
-
-  // z — depth (recede into screen)
-  let z: number;
-  if (a <= 1) z = -180 * a;
-  else if (a <= 2) z = -180 + (a - 1) * -240;
-  else z = -420 + (a - 2) * -120;
-
-  // rotateY — 3D twist
-  let ry: number;
-  if (a <= 1) ry = 40 * a;
-  else if (a <= 2) ry = 40 + (a - 1) * 18;
-  else ry = 58 + (a - 2) * 6;
-  ry = Math.min(ry, 72);
-  ry = s * ry;
-
-  // scale
-  let scale: number;
-  if (a <= 1) scale = 1 - 0.3 * a;
-  else if (a <= 2) scale = 0.7 - 0.22 * (a - 1);
-  else scale = Math.max(0.2, 0.48 - 0.12 * (a - 2));
-
-  // opacity
-  let opacity: number;
-  if (a <= 1) opacity = 1 - 0.2 * a;
-  else if (a <= 2) opacity = 0.8 - 0.35 * (a - 1);
-  else opacity = Math.max(0, 0.45 - 0.3 * (a - 2));
-
-  // blur (px)
-  let blur: number;
-  if (a <= 1) blur = 2 * a;
-  else if (a <= 2) blur = 2 + 2 * (a - 1);
-  else blur = 4 + 2 * (a - 2);
-
-  return { x, z, rotateY: ry, scale, opacity, blur, abs: a };
-}
+// Roulette disk geometry.
+const TILT = 56; // degrees the disk is tilted back (0 = flat from top, 90 = vertical)
+const RADIUS = 180; // px — how far donuts sit from the disk center
 
 /** Wrap a raw offset into the shortest signed range [-len/2, len/2). */
 function wrapOffset(o: number, len: number) {
@@ -80,34 +40,68 @@ function wrapOffset(o: number, len: number) {
   return ((((o + half) % len) + len) % len) - half;
 }
 
-/** One donut card — derives ALL its transforms from the shared `position` MV. */
+/**
+ * Compute the on-screen position + visual properties for a donut at slot
+ * offset `o` from the front, on a tilted roulette disk with `len` slots.
+ *
+ * Returns:
+ *  - x:       horizontal screen offset (sin of angle × radius)
+ *  - y:       vertical screen offset (ellipse — foreshortened by tilt)
+ *  - z:       depth (front = toward viewer, back = away)
+ *  - scale, opacity, blur, zIndex: depth-based visual cues
+ */
+function slot(o: number, len: number) {
+  // Angle around the disk from the front (bottom) position. 0 = front,
+  // 180 = back. Positive = clockwise (to the right first).
+  const angleDeg = (o / len) * 360;
+  const rad = (angleDeg * Math.PI) / 180;
+
+  // Position on the disk (before tilt): front donut at bottom (y+).
+  const diskX = Math.sin(rad) * RADIUS;
+  const diskY = Math.cos(rad) * RADIUS; // +y = front/bottom on disk
+
+  // After rotateX(TILT): y foreshortens (× cos TILT), z gains depth (× sin TILT).
+  const tiltRad = (TILT * Math.PI) / 180;
+  const x = diskX;
+  const y = diskY * Math.cos(tiltRad); // vertical on screen (ellipse)
+  const z = diskY * Math.sin(tiltRad); // +z = toward viewer (front)
+
+  // Depth factor: 0 at front, 1 at back.
+  const depth = (1 - Math.cos(rad)) / 2;
+  const scale = 1 - depth * 0.5;
+  const opacity = Math.max(0.18, 1 - depth * 0.75);
+  const blur = depth * 4.5;
+  const zIndex = Math.round(20 - depth * 30);
+
+  return { x, y, z, scale, opacity, blur, zIndex };
+}
+
+/** One donut on the roulette disk — derives ALL transforms from `position`. */
 function DonutCard3D({
   donut,
   index,
   position,
   len,
-  onOpen,
   onCenter,
 }: {
   donut: Donut;
   index: number;
   position: ReturnType<typeof useMotionValue>;
   len: number;
-  onOpen: () => void;
   onCenter: () => void;
 }) {
-  // Wrapped offset (shortest path around the ring) as a motion value.
+  // Wrapped offset of this donut from the front (shortest path around).
   const wrapped = useTransform(position, (p) => wrapOffset(index - p, len));
 
-  const x = useTransform(wrapped, (o) => slot(o).x);
-  const z = useTransform(wrapped, (o) => slot(o).z);
-  const rotateY = useTransform(wrapped, (o) => slot(o).rotateY);
-  const scale = useTransform(wrapped, (o) => slot(o).scale);
-  const opacity = useTransform(wrapped, (o) => slot(o).opacity);
-  const filter = useTransform(wrapped, (o) => `blur(${slot(o).blur}px)`);
-  const zIndex = useTransform(wrapped, (o) => Math.round(20 - Math.abs(o) * 3));
+  const x = useTransform(wrapped, (o) => slot(o, len).x);
+  const y = useTransform(wrapped, (o) => slot(o, len).y);
+  const z = useTransform(wrapped, (o) => slot(o, len).z);
+  const scale = useTransform(wrapped, (o) => slot(o, len).scale);
+  const opacity = useTransform(wrapped, (o) => slot(o, len).opacity);
+  const filter = useTransform(wrapped, (o) => `blur(${slot(o, len).blur}px)`);
+  const zIndex = useTransform(wrapped, (o) => slot(o, len).zIndex);
 
-  // Center price pill fades in only when this card is near center.
+  // Price pill visible only when near front.
   const pillOpacity = useTransform(wrapped, (o) =>
     Math.max(0, 1 - Math.abs(o) * 2.2)
   );
@@ -118,37 +112,35 @@ function DonutCard3D({
       onClick={onCenter}
       style={{
         x,
+        y,
         z,
-        rotateY,
         scale,
         opacity,
         filter,
         zIndex,
         transformStyle: "preserve-3d",
       }}
-      className="absolute left-1/2 top-1/2 flex h-[280px] w-[280px] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center sm:h-[340px] sm:w-[340px]"
+      className="absolute left-1/2 top-1/2 flex h-[260px] w-[260px] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center sm:h-[300px] sm:w-[300px]"
       aria-label={donut.name}
     >
-      {/* spinning donut image (the donut itself spins, the card position is rigid) */}
       <motion.div
         animate={{ rotate: 360 }}
-        transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 24, repeat: Infinity, ease: "linear" }}
         className="relative"
       >
         <img
           src={donut.imgUrl}
           alt={donut.name}
-          className="size-56 object-contain drop-shadow-[0_18px_18px_rgba(7,51,79,0.28)] sm:size-72"
+          className="size-44 object-contain drop-shadow-[0_14px_14px_rgba(7,51,79,0.3)] sm:size-52"
           draggable={false}
         />
       </motion.div>
 
-      {/* center price pill */}
       <motion.div
         style={{ opacity: pillOpacity }}
-        className="pointer-events-none absolute bottom-2 inline-flex items-center gap-2 rounded-full bg-[var(--color-dowgnut-blue-dark)] px-4 py-1.5 text-sm font-bold text-white shadow-lg"
+        className="pointer-events-none absolute bottom-2 inline-flex items-center gap-2 rounded-full bg-[var(--color-dowgnut-blue-dark)] px-3 py-1 text-xs font-bold text-white shadow-lg"
       >
-        <Star className="size-3.5 fill-[var(--color-dowgnut-lime)] text-[var(--color-dowgnut-lime)]" />
+        <Star className="size-3 fill-[var(--color-dowgnut-lime)] text-[var(--color-dowgnut-lime)]" />
         {donut.rating.toFixed(1)}
         <span className="text-white/40">·</span>
         ${donut.price.toFixed(2)}
@@ -165,64 +157,52 @@ export function DonutCarousel3D() {
   const featured = useMemo(() => {
     const f = donuts.filter((d) => d.featured);
     const pool = f.length >= 5 ? f : donuts;
-    return pool.slice(0, Math.min(7, pool.length));
+    return pool.slice(0, 5);
   }, [donuts]);
 
   const len = featured.length;
 
-  // Single source of truth for the whole ring's rotation (float, donut units).
   const position = useMotionValue(0);
-  const [center, setCenter] = useState(0); // integer label index (wrapped)
+  const [center, setCenter] = useState(0);
   const [paused, setPaused] = useState(false);
   const [dragging, setDragging] = useState(false);
 
-  // Reset if catalog shrinks (adjust-state-during-render pattern).
   if (len > 0 && center >= len) {
     setCenter(0);
     if (position.get() > len) position.set(0);
   }
 
-  // Snap helper — animate the shared position to an integer, update label.
   const snapTo = (targetInt: number) => {
     animate(position, targetInt, {
       type: "spring",
-      stiffness: 180,
-      damping: 26,
+      stiffness: 170,
+      damping: 24,
     });
     const wrapped = ((targetInt % len) + len) % len;
     setCenter(wrapped);
   };
 
   const go = (dir: number) => {
-    const target = Math.round(position.get()) + dir;
-    snapTo(target);
+    snapTo(Math.round(position.get()) + dir);
   };
 
-  // Auto-rotate every 3.4s.
   useEffect(() => {
     if (paused || dragging || len === 0) return;
-    const t = setInterval(() => {
-      go(1);
-    }, 3400);
+    const t = setInterval(() => go(1), 3600);
     return () => clearInterval(t);
   }, [paused, dragging, len]);
 
   if (len === 0) return null;
 
   const onPan = (_: unknown, info: PanInfo) => {
-    // Live-track finger: position = startCenter - delta/px.
-    // (Drag right → position decreases → previous donut comes to center.)
     position.set(center - info.offset.x / PX_PER_DONUT);
   };
   const onPanEnd = () => {
-    const target = Math.round(position.get());
-    snapTo(target);
+    snapTo(Math.round(position.get()));
     setDragging(false);
   };
 
-  // Clicking a side donut: rotate the ring so it lands at center.
   const centerThis = (index: number) => {
-    // Shortest signed delta from current rounded position to this index.
     const current = Math.round(position.get());
     let delta = index - (((current % len) + len) % len);
     if (delta > len / 2) delta -= len;
@@ -235,11 +215,11 @@ export function DonutCarousel3D() {
   return (
     <section
       className="relative mx-auto mt-8 w-full max-w-7xl px-4 sm:px-6"
-      aria-label="Featured donuts — 3D carousel"
+      aria-label="Featured donuts — roulette carousel"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* Section heading */}
+      {/* Heading */}
       <div className="mb-2 flex items-end justify-between gap-3 px-1">
         <div>
           <p className="graffiti-text text-xs uppercase tracking-[0.25em] text-[var(--color-dowgnut-pink-dark)]">
@@ -250,28 +230,54 @@ export function DonutCarousel3D() {
           </h2>
         </div>
         <p className="hidden text-xs text-[var(--color-dowgnut-blue-dark)]/50 sm:block">
-          drag the ring · tap a donut
+          drag the wheel · tap a donut
         </p>
       </div>
 
-      {/* 3D stage */}
+      {/* Roulette stage */}
       <div
-        className="relative h-[340px] w-full overflow-hidden sm:h-[440px]"
+        className="relative h-[400px] w-full overflow-hidden sm:h-[460px]"
         style={{ perspective: "1400px" }}
       >
-        {/* Pan gesture layer (transparent) — drives the shared `position`. */}
+        {/* Pan/drag layer */}
         <motion.div
-          className="absolute inset-0 z-30 cursor-grab touch-pan-y active:cursor-grabbing"
+          className="absolute inset-0 z-40 cursor-grab touch-pan-y active:cursor-grabbing"
           onPanStart={() => setDragging(true)}
           onPan={onPan}
           onPanEnd={onPanEnd}
         />
 
-        {/* The rigid ring — all cards derive from ONE position value. */}
+        {/* Tilted roulette disk */}
         <div
           className="absolute inset-0"
-          style={{ transformStyle: "preserve-3d" }}
+          style={{
+            transformStyle: "preserve-3d",
+            transform: `rotateX(${TILT}deg)`,
+          }}
         >
+          {/* Disk surface (decorative) */}
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-[6px] border-[var(--color-dowgnut-blue-dark)]/15 bg-[var(--color-dowgnut-cream)]/40"
+            style={{ width: RADIUS * 2 + 80, height: RADIUS * 2 + 80 }}
+          />
+          {/* Inner ring */}
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-dashed border-[var(--color-dowgnut-pink)]/30"
+            style={{ width: RADIUS * 2, height: RADIUS * 2 }}
+          />
+
+          {/* Center hub */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <motion.div
+              animate={{ rotate: -360 }}
+              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+              className="flex size-20 items-center justify-center rounded-full bg-[var(--color-dowgnut-blue-dark)] text-2xl shadow-lg sm:size-24"
+            >
+              🍩
+            </motion.div>
+          </div>
+
+          {/* Donuts on the disk */}
           {featured.map((donut, i) => (
             <DonutCard3D
               key={donut.id}
@@ -279,15 +285,18 @@ export function DonutCarousel3D() {
               index={i}
               position={position}
               len={len}
-              onOpen={() => {
-                // Only open detail if this card is (roughly) centered.
+              onCenter={() => {
                 const off = Math.abs(wrapOffset(i - position.get(), len));
                 if (off < 0.5) openDetail(donut);
                 else centerThis(i);
               }}
-              onCenter={() => centerThis(i)}
             />
           ))}
+        </div>
+
+        {/* Front pointer (marks the active/selected donut at the bottom) */}
+        <div className="pointer-events-none absolute bottom-2 left-1/2 z-50 -translate-x-1/2">
+          <div className="h-0 w-0 border-x-[12px] border-t-[18px] border-x-transparent border-t-[var(--color-dowgnut-pink)] drop-shadow" />
         </div>
       </div>
 
