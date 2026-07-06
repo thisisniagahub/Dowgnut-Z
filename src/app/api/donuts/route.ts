@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { serializeDonut } from "@/lib/serialize";
+import { ensureReady } from "@/lib/ensure-ready";
 
 // GET /api/donuts?type=all|classic|sprinkled|stuffed|specialty&search=&sort=featured|price-asc|price-desc|rating|name&featured=true
 export async function GET(request: Request) {
   try {
+    // Ensure schema + catalog exist (matters on Vercel cold starts).
+    await ensureReady();
+
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type") ?? "all";
     const search = (searchParams.get("search") ?? "").trim().toLowerCase();
