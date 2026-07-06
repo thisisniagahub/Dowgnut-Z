@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence, type PanInfo } from "framer-motion";
-import { ChevronLeft, ChevronRight, Star, Plus } from "lucide-react";
+import { Star, Plus } from "lucide-react";
 import { useShop } from "@/store/use-shop";
 import type { Donut } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -196,22 +196,6 @@ export function DonutCarousel3D() {
             </motion.button>
           );
         })}
-
-        {/* Arrows */}
-        <button
-          onClick={() => go(-1)}
-          aria-label="Previous donut"
-          className="absolute left-1 top-1/2 z-20 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--color-dowgnut-blue-dark)]/80 text-white backdrop-blur transition-transform hover:scale-110 active:scale-95 sm:left-3"
-        >
-          <ChevronLeft className="size-6" />
-        </button>
-        <button
-          onClick={() => go(1)}
-          aria-label="Next donut"
-          className="absolute right-1 top-1/2 z-20 inline-flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--color-dowgnut-blue-dark)]/80 text-white backdrop-blur transition-transform hover:scale-110 active:scale-95 sm:right-3"
-        >
-          <ChevronRight className="size-6" />
-        </button>
       </div>
 
       {/* Active donut label + actions */}
