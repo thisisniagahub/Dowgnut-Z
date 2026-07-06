@@ -123,12 +123,14 @@ function DonutCard3D({
       className="absolute left-1/2 top-1/2 flex h-[260px] w-[260px] -translate-x-1/2 -translate-y-1/2 items-center justify-center sm:h-[300px] sm:w-[300px]"
       aria-label={donut.name}
     >
-      <img
-        src={donut.imgUrl}
-        alt={donut.name}
-        className="size-48 object-contain drop-shadow-[0_14px_14px_rgba(7,51,79,0.3)] sm:size-56"
-        draggable={false}
-      />
+      <div className="flex size-44 items-center justify-center sm:size-52">
+        <img
+          src={donut.imgUrl}
+          alt={donut.name}
+          className="size-full object-contain"
+          draggable={false}
+        />
+      </div>
     </motion.button>
   );
 }
