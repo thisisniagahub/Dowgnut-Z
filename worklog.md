@@ -458,3 +458,31 @@ Stage Summary:
 - WORKS on Vercel: Shop (21 donuts, frameless cards), Swipe mode, Detail modal (minimal/rotating), Cart, Favorites, Checkout, Orders, Admin dashboard (stats+charts), auto-migrate+seed SQLite.
 - DOES NOT WORK on Vercel: AI Concierge + AI Designer (z-ai-web-dev-sdk sandbox token is IP-restricted; needs proper Z.ai API credentials or swap to OpenAI/Anthropic). Real-time order tracking (WebSocket can't run on Vercel serverless; REST fallback shows last-known status only).
 - GitHub repo: https://github.com/thisisniagahub/Dowgnut-Z (commit 075ea91).
+
+---
+Task ID: 14
+Agent: main (Z.ai Code) — gempak 3D donut carousel
+Task: User wants a 3D coverflow carousel showing 4-5 donuts with 3D rotation animation — "gempak" (cool/impressive) style.
+
+Work Log:
+- Created src/components/dowgnut/donut-carousel-3d.tsx — a 3D coverflow carousel:
+  - Shows 5 donuts at once: 1 center (ACTIVE, big, sharp) + 2 sides (angled, smaller, blur 1.5px) + 2 far (very angled, tiny, blur 3px, 50% opacity).
+  - 3D transforms per slot offset: center rotateY 0° scale 1.0; ±1 rotateY ±38° scale 0.72 z -160; ±2 rotateY ±55° scale 0.5 z -380. Uses CSS perspective(1300px) + transformStyle preserve-3d.
+  - Auto-rotates every 3.2s (pauses on hover/drag).
+  - Interactions: drag left/right to rotate, arrow buttons (prev/next), click side donut to center it, click center donut to open detail modal, dot indicators.
+  - Center donut spins continuously (framer-motion rotate 360°, 18s loop); side donuts spin slower (26s).
+  - Active donut label (graffiti h3) with AnimatePresence transition + "View donut" and "Add to cart" action buttons.
+  - Rating + price pill on center donut.
+- Wired into src/app/page.tsx shop view: HeroCarousel → DonutCarousel3D → DonutGrid.
+- Fixed lint: replaced setState-in-effect with "adjust state during render" pattern for center-reset on catalog shrink.
+- Verified via agent-browser:
+  - 5 donut images rendered ✓
+  - 3D matrix3d transforms confirmed (center: transform none; ±1: rotateY ±38°; ±2: rotateY ±55°) ✓
+  - Opacity gradient: center 100%, ±1 85%, ±2 50% ✓
+  - Blur gradient: center 0px, ±1 1.5px, ±2 3px ✓
+  - Next arrow advances center donut (Maple Bacon Bar → Classic Glazed) ✓
+  - Mobile 390px: 5 imgs, zero horizontal overflow ✓
+- Committed + pushed to GitHub (e1c98f2). Vercel auto-deploys from main.
+
+Stage Summary:
+- 3D coverflow donut carousel live — exactly matches user's "gempak" target diagram (center big+sharp, sides small+blur, far transparent). Auto-rotate + drag + arrows + clickable. Deployed to Vercel via GitHub push.
