@@ -8,6 +8,7 @@ import { HeroCarousel } from "@/components/dowgnut/hero-carousel";
 import { FilterBar } from "@/components/dowgnut/filter-bar";
 import { AIFlavorMatch } from "@/components/dowgnut/ai-flavor-match";
 import { DonutGrid } from "@/components/dowgnut/donut-grid";
+import { SwipeView } from "@/components/dowgnut/swipe-view";
 import { FavoritesView } from "@/components/dowgnut/favorites-view";
 import { CheckoutView } from "@/components/dowgnut/checkout-view";
 import { OrdersView } from "@/components/dowgnut/orders-view";
@@ -40,6 +41,7 @@ export default function Home() {
             <DonutGrid />
           </>
         )}
+        {view === "swipe" && <SwipeView />}
         {view === "favorites" && <FavoritesView />}
         {view === "checkout" && <CheckoutView />}
         {view === "orders" && <OrdersView />}

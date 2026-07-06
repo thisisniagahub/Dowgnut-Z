@@ -273,3 +273,41 @@ Work Log:
 
 Stage Summary:
 - Original DowgNut brand logo restored across splash, header, footer. AI-generated mascot retained as a decorative accent only. Brand authenticity preserved.
+
+---
+Task ID: 7
+Agent: main (Z.ai Code) — add swipe-to-preview donut mode
+Task: User asked to be able to swipe through donuts to preview them one-by-one (Tinder-style).
+
+Work Log:
+- Added "swipe" to ShopView union in src/store/use-shop.ts.
+- Added a "Swipe" nav item (Shuffle icon) to the header NAV array in dowgnut-header.tsx.
+- Created src/components/dowgnut/swipe-view.tsx — a Tinder-style donut swipe deck:
+  - Card stack: top card draggable (framer-motion drag), 2 back cards scaled + offset.
+  - Two-layer motion structure: outer motion.div for stack position (scale+y), inner motion.div for drag/fly-out (x/y/rotate/opacity motion values) — avoids framer-motion style/animate conflict.
+  - Drag gestures: swipe right = Love (favorite) 💗, swipe left = Skip, swipe up = Add to cart 🛒. Threshold-based on offset/velocity.
+  - Live overlay stamps during drag: "LOVE 💗" / "NOPE" / "CART! 🛒" fading in based on drag direction (useTransform on motion values).
+  - Action buttons (Skip/Love/Cart) for accessibility — trigger flyOut via useImperativeHandle ref on the top card.
+  - Progress bar + "N / 21" counter.
+  - "Details" button opens the existing detail modal.
+  - End-of-deck summary screen: trophy, counts (Loved/Carted/Skipped), "Swipe again" / "View cart" / "Favorites" actions.
+  - Reset on catalog/filter change via React-recommended "adjust state during render" pattern (avoids setState-in-effect lint error).
+  - Empty-state and loading-state handling.
+- Wired SwipeView into src/app/page.tsx (view === "swipe").
+- Debugged two issues found via agent-browser:
+  1. framer-motion style/animate conflict on single element → fixed with two-layer motion.div split.
+  2. ReferenceError: `dir` (function param) mistakenly placed in useCallback deps array → removed.
+- Verified via agent-browser through the gateway:
+  - Deck renders (21 donuts, stacked cards, LOVE/NOPE/CART stamps).
+  - Love button → 2/21 + favorite toast.
+  - Skip button → 3/21.
+  - Cart button → 4/21 + "Added to your dowgs! 🛒" toast.
+  - Physical drag-right → advances (Love).
+  - Physical drag-up → advances (Cart) + toast.
+  - Fast-forward to end → "You tasted them all!" summary with correct counts (19 loved / 1 carted / 1 skipped) + action buttons.
+  - "Swipe again" restarts from 1/21.
+  - Mobile 390px: zero horizontal overflow.
+- Lint clean. No console/runtime errors.
+
+Stage Summary:
+- Swipe-to-preview donut mode complete and browser-verified. Swipe ← skip · → love 💗 · ↑ cart 🛒, plus buttons. Accessible via the "Swipe" nav tab. Brand-consistent graffiti styling preserved.
