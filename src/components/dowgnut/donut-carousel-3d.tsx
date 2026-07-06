@@ -131,7 +131,7 @@ function DonutCard3D({
         <img
           src={donut.imgUrl}
           alt={donut.name}
-          className="size-44 object-contain drop-shadow-[0_14px_14px_rgba(7,51,79,0.3)] sm:size-52"
+          className="size-48 object-contain drop-shadow-[0_14px_14px_rgba(7,51,79,0.3)] sm:size-56"
           draggable={false}
         />
       </motion.div>
@@ -236,7 +236,7 @@ export function DonutCarousel3D() {
 
       {/* Roulette stage */}
       <div
-        className="relative h-[400px] w-full overflow-hidden sm:h-[460px]"
+        className="relative h-[340px] w-full overflow-hidden sm:h-[420px]"
         style={{ perspective: "1400px" }}
       >
         {/* Pan/drag layer */}
@@ -247,7 +247,7 @@ export function DonutCarousel3D() {
           onPanEnd={onPanEnd}
         />
 
-        {/* Tilted roulette disk */}
+        {/* Tilted roulette disk (no background — donuts float on the tilt) */}
         <div
           className="absolute inset-0"
           style={{
@@ -255,28 +255,6 @@ export function DonutCarousel3D() {
             transform: `rotateX(${TILT}deg)`,
           }}
         >
-          {/* Disk surface (decorative) */}
-          <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-[6px] border-[var(--color-dowgnut-blue-dark)]/15 bg-[var(--color-dowgnut-cream)]/40"
-            style={{ width: RADIUS * 2 + 80, height: RADIUS * 2 + 80 }}
-          />
-          {/* Inner ring */}
-          <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-dashed border-[var(--color-dowgnut-pink)]/30"
-            style={{ width: RADIUS * 2, height: RADIUS * 2 }}
-          />
-
-          {/* Center hub */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <motion.div
-              animate={{ rotate: -360 }}
-              transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-              className="flex size-20 items-center justify-center rounded-full bg-[var(--color-dowgnut-blue-dark)] text-2xl shadow-lg sm:size-24"
-            >
-              🍩
-            </motion.div>
-          </div>
-
           {/* Donuts on the disk */}
           {featured.map((donut, i) => (
             <DonutCard3D
@@ -292,11 +270,6 @@ export function DonutCarousel3D() {
               }}
             />
           ))}
-        </div>
-
-        {/* Front pointer (marks the active/selected donut at the bottom) */}
-        <div className="pointer-events-none absolute bottom-2 left-1/2 z-50 -translate-x-1/2">
-          <div className="h-0 w-0 border-x-[12px] border-t-[18px] border-x-transparent border-t-[var(--color-dowgnut-pink)] drop-shadow" />
         </div>
       </div>
 
