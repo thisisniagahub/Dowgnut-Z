@@ -255,3 +255,21 @@ Stage Summary:
 - Project COMPLETE and browser-verified. All features functional end-to-end through the gateway.
 - 15 verification screenshots saved to /home/z/my-project/verify-*.png.
 - Known non-blocking notes: AI image generation takes ~15-30s (spinner shown); admin route has no auth gate (out of scope); Prisma query logging is noisy in dev.log (harmless).
+
+---
+Task ID: 6
+Agent: main (Z.ai Code) — restore original logo
+Task: User asked "mana logo ori?" (where's the original logo?) — restore the original DowgNut brand wordmark from the source repo.
+
+Work Log:
+- Located original brand assets in /tmp/Dowgnut-F/assets/brand/: dowgnut_logo_wordmark_transparent.png (573×233, blue graffiti wordmark + pink dripping donut "O", transparent bg) and dowgnut_brand_reference.jpg (768×1376).
+- Copied both to /home/z/my-project/public/brand/ as dowgnut-logo-wordmark.png and dowgnut-brand-reference.jpg.
+- Reviewed original Flutter DowgNutLogo widget (lib/theme/dowgnut_logo.dart) — confirmed wordmark is colored (blue+pink) for LIGHT backgrounds.
+- Created reusable src/components/dowgnut/dowgnut-logo.tsx with plain + pill variants.
+- Updated splash-screen.tsx: replaced graffiti-text "DowgNut" h1 with the original wordmark image (mascot kept as small floating accent above).
+- Updated dowgnut-header.tsx: replaced mascot+white-text combo with the original wordmark on a cream rounded pill (so it's visible on the blue header bg).
+- Updated dowgnut-footer.tsx: replaced white graffiti-text "DowgNut" with the original wordmark on a cream pill.
+- Verified via agent-browser through the gateway: splash, header, and footer all render the 573×233 original wordmark (visible:true, naturalWidth:573). Lint clean. No console errors.
+
+Stage Summary:
+- Original DowgNut brand logo restored across splash, header, footer. AI-generated mascot retained as a decorative accent only. Brand authenticity preserved.

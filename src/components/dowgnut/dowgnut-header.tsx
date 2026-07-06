@@ -52,19 +52,19 @@ export function DowgnutHeader() {
   return (
     <header className="sticky top-0 z-40 border-b-4 border-[var(--color-dowgnut-pink)] bg-[var(--color-dowgnut-blue)] text-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6">
-        {/* Brand */}
+        {/* Brand — original DowgNut wordmark on a cream pill (visible on blue bg) */}
         <button
           onClick={() => go("shop")}
-          className="flex shrink-0 items-center gap-2"
+          className="flex shrink-0 items-center"
           aria-label="DowgNut home"
         >
-          <img
-            src="/brand/dowgnut-mascot.png"
-            alt=""
-            className="h-9 w-9 object-contain drop-shadow"
-          />
-          <span className="graffiti-text brand-stroke text-2xl text-white sm:text-3xl">
-            DowgNut
+          <span className="inline-flex items-center rounded-full bg-[var(--color-dowgnut-cream)] px-3 py-1 shadow-sm">
+            <img
+              src="/brand/dowgnut-logo-wordmark.png"
+              alt="DowgNut"
+              className="h-7 w-auto"
+              draggable={false}
+            />
           </span>
         </button>
 

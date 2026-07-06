@@ -18,10 +18,12 @@ export function DowgnutFooter() {
               alt=""
               className="size-12 animate-float object-contain"
             />
-            <div>
-              <p className="graffiti-text text-2xl text-white">DowgNut</p>
-              <p className="text-xs text-white/60">Good Vibes & Good Dowg</p>
-            </div>
+            <img
+              src="/brand/dowgnut-logo-wordmark.png"
+              alt="DowgNut"
+              className="h-9 w-auto bg-[var(--color-dowgnut-cream)] rounded-full px-3 py-1"
+              draggable={false}
+            />
           </div>
           <p className="mt-4 max-w-xs text-sm text-white/70">
             Bold, playful, authentic donuts — freshly glazed daily and

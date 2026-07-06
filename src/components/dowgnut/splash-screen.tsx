@@ -48,19 +48,24 @@ export function SplashScreen() {
             <img
               src="/brand/dowgnut-mascot.png"
               alt="DowgNut mascot"
-              className="h-36 w-36 object-contain sm:h-48 sm:w-48 drip-shadow"
+              className="h-24 w-24 object-contain sm:h-32 sm:w-32 drip-shadow"
             />
           </motion.div>
 
-          <motion.h1
+          {/* Original DowgNut wordmark logo (from source Flutter repo) */}
+          <motion.div
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.15, type: "spring", stiffness: 180, damping: 14 }}
-            className="graffiti-text brand-stroke mt-4 text-6xl text-[var(--color-dowgnut-pink)] sm:text-8xl"
-            style={{ textShadow: "0 6px 0 rgba(7,51,79,0.18)" }}
+            className="mt-4 drip-shadow"
           >
-            DowgNut
-          </motion.h1>
+            <img
+              src="/brand/dowgnut-logo-wordmark.png"
+              alt="DowgNut"
+              className="h-20 w-auto sm:h-28"
+              draggable={false}
+            />
+          </motion.div>
 
           <motion.p
             initial={{ y: 20, opacity: 0 }}
