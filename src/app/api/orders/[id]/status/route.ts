@@ -1,0 +1,51 @@
+import { NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { serializeOrder } from "@/lib/serialize";
+
+const VALID_STATUSES = new Set([
+  "preparing",
+  "baking",
+  "out_for_delivery",
+  "delivered",
+]);
+
+// PATCH /api/orders/[id]/status  { status }  →  Order
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const body = await request.json();
+    const status = String(body.status ?? "").trim();
+
+    if (!VALID_STATUSES.has(status)) {
+      return NextResponse.json(
+        { error: `Invalid status. Must be one of: ${[...VALID_STATUSES].join(", ")}` },
+        { status: 400 }
+      );
+    }
+
+    const existing = await db.order.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json(
+        { error: "Order not found" },
+        { status: 404 }
+      );
+    }
+
+    const updated = await db.order.update({
+      where: { id },
+      data: { status },
+      include: { items: true },
+    });
+
+    return NextResponse.json(serializeOrder(updated));
+  } catch (err) {
+    console.error("[api/orders/[id]/status PATCH]", err);
+    return NextResponse.json(
+      { error: "Failed to update order status" },
+      { status: 500 }
+    );
+  }
+}

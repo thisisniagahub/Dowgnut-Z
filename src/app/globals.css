@@ -1,0 +1,206 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* DowgNut brand tokens */
+  --color-dowgnut-blue: #07579b;
+  --color-dowgnut-blue-light: #2d7fc2;
+  --color-dowgnut-blue-dark: #07334f;
+  --color-dowgnut-pink: #f05a9b;
+  --color-dowgnut-pink-soft: #ff9ac7;
+  --color-dowgnut-pink-dark: #c93373;
+  --color-dowgnut-lime: #e8f866;
+  --color-dowgnut-lime-bright: #f7ffd6;
+  --color-dowgnut-lime-dark: #b9c96a;
+  --color-dowgnut-cream: #fff9e8;
+  --color-dowgnut-dough: #d4b36a;
+  --color-dowgnut-grey: #aea294;
+}
+
+:root {
+  --radius: 0.75rem;
+  /* DowgNut brand-driven light theme */
+  --background: #f7ffd6;          /* neon lime bright — app bg */
+  --foreground: #07334f;          /* dark navy */
+  --card: #fff9e8;                /* cream surface */
+  --card-foreground: #07334f;
+  --popover: #fff9e8;
+  --popover-foreground: #07334f;
+  --primary: #07579b;             /* dowgnut blue */
+  --primary-foreground: #ffffff;
+  --secondary: #f05a9b;           /* frosting pink */
+  --secondary-foreground: #ffffff;
+  --muted: #fff4d6;
+  --muted-foreground: #5b6b78;
+  --accent: #e8f866;              /* neon lime */
+  --accent-foreground: #07334f;
+  --destructive: #c93373;
+  --border: #07334f1a;
+  --input: #fff9e8;
+  --ring: #07579b;
+  --chart-1: #07579b;
+  --chart-2: #f05a9b;
+  --chart-3: #e8f866;
+  --chart-4: #d4b36a;
+  --chart-5: #07334f;
+  --sidebar: #fff9e8;
+  --sidebar-foreground: #07334f;
+  --sidebar-primary: #07579b;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e8f866;
+  --sidebar-accent-foreground: #07334f;
+  --sidebar-border: #07334f1a;
+  --sidebar-ring: #07579b;
+}
+
+.dark {
+  --background: #07334f;
+  --foreground: #f7ffd6;
+  --card: #0a4368;
+  --card-foreground: #f7ffd6;
+  --popover: #0a4368;
+  --popover-foreground: #f7ffd6;
+  --primary: #f05a9b;
+  --primary-foreground: #ffffff;
+  --secondary: #e8f866;
+  --secondary-foreground: #07334f;
+  --muted: #0a4368;
+  --muted-foreground: #c9d6e0;
+  --accent: #2d7fc2;
+  --accent-foreground: #f7ffd6;
+  --destructive: #c93373;
+  --border: #f7ffd61a;
+  --input: #0a4368;
+  --ring: #f05a9b;
+  --chart-1: #f05a9b;
+  --chart-2: #e8f866;
+  --chart-3: #2d7fc2;
+  --chart-4: #d4b36a;
+  --chart-5: #f7ffd6;
+  --sidebar: #0a4368;
+  --sidebar-foreground: #f7ffd6;
+  --sidebar-primary: #f05a9b;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2d7fc2;
+  --sidebar-accent-foreground: #f7ffd6;
+  --sidebar-border: #f7ffd61a;
+  --sidebar-ring: #f05a9b;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv01";
+  }
+}
+
+/* ── DowgNut graffiti utilities ─────────────────────────── */
+@layer utilities {
+  .graffiti-text {
+    font-family: var(--font-display), var(--font-geist-sans), system-ui, sans-serif;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    line-height: 0.9;
+  }
+  .brand-stroke {
+    -webkit-text-stroke: 2px #07334f;
+    paint-order: stroke fill;
+  }
+  .drip-shadow {
+    filter: drop-shadow(0 6px 0 rgba(7, 51, 79, 0.18));
+  }
+  .lime-bg-grid {
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(7, 51, 79, 0.08) 1px, transparent 0);
+    background-size: 22px 22px;
+  }
+  .scrollbar-dowgnut::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  .scrollbar-dowgnut::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-dowgnut::-webkit-scrollbar-thumb {
+    background: #07579b55;
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  .scrollbar-dowgnut::-webkit-scrollbar-thumb:hover {
+    background: #07579b99;
+    background-clip: content-box;
+  }
+  .animate-float {
+    animation: dowgnut-float 4s ease-in-out infinite;
+  }
+  .animate-spin-slow {
+    animation: dowgnut-spin 22s linear infinite;
+  }
+  .animate-wiggle {
+    animation: dowgnut-wiggle 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes dowgnut-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes dowgnut-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes dowgnut-wiggle {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+@keyframes dowgnut-drip {
+  0% { transform: scaleY(0); transform-origin: top; opacity: 0; }
+  60% { opacity: 1; }
+  100% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+}

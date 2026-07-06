@@ -1,0 +1,106 @@
+// DowgNut — Prisma schema for advanced donut e-commerce
+// SQLite datasource
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ── Catalog ────────────────────────────────────────────────
+model Donut {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String
+  price       Float
+  type        String   // classic | sprinkled | stuffed | specialty
+  imgUrl      String
+  tags        String   @default("") // comma-separated e.g. "chocolate,glazed"
+  rating      Float    @default(4.5)
+  calories    Int      @default(250)
+  stock       Int      @default(50)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  cartItems   CartItem[]
+  favorites   Favorite[]
+  orderItems  OrderItem[]
+  reviews     Review[]
+}
+
+// ── Cart (single anonymous shopper per session) ────────────
+model CartItem {
+  id        String   @id @default(cuid())
+  sessionId String
+  donutId   String
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  donut Donut @relation(fields: [donutId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, donutId])
+}
+
+// ── Favorites / Wishlist ───────────────────────────────────
+model Favorite {
+  id        String   @id @default(cuid())
+  sessionId String
+  donutId   String
+  createdAt DateTime @default(now())
+
+  donut Donut @relation(fields: [donutId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, donutId])
+}
+
+// ── Orders ─────────────────────────────────────────────────
+model Order {
+  id            String   @id @default(cuid())
+  sessionId     String
+  customerName  String
+  customerEmail String
+  address       String
+  city          String
+  zip           String
+  notes         String   @default("")
+  subtotal      Float
+  delivery      Float    @default(3.99)
+  total         Float
+  status        String   @default("preparing") // preparing | baking | out_for_delivery | delivered
+  etaMinutes    Int      @default(25)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  donutId   String
+  name      String // snapshot
+  price     Float  // snapshot
+  imgUrl    String // snapshot
+  quantity  Int
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  donut Donut @relation(fields: [donutId], references: [id], onDelete: Restrict)
+}
+
+// ── Reviews ────────────────────────────────────────────────
+model Review {
+  id        String   @id @default(cuid())
+  donutId   String
+  sessionId String
+  author    String
+  rating    Int // 1-5
+  comment   String
+  createdAt DateTime @default(now())
+
+  donut Donut @relation(fields: [donutId], references: [id], onDelete: Cascade)
+}
