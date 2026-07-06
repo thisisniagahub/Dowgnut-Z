@@ -5,6 +5,7 @@ import { useShop } from "@/store/use-shop";
 import { SplashScreen } from "@/components/dowgnut/splash-screen";
 import { DowgnutHeader } from "@/components/dowgnut/dowgnut-header";
 import { HeroCarousel } from "@/components/dowgnut/hero-carousel";
+import { VideoCommercial } from "@/components/dowgnut/video-commercial";
 import { DonutCarousel3D } from "@/components/dowgnut/donut-carousel-3d";
 import { DonutGrid } from "@/components/dowgnut/donut-grid";
 import { SwipeView } from "@/components/dowgnut/swipe-view";
@@ -35,6 +36,7 @@ export default function Home() {
         {view === "shop" && (
           <>
             <HeroCarousel />
+            <VideoCommercial />
             <DonutCarousel3D />
             <DonutGrid />
           </>
