@@ -65,7 +65,9 @@ function slot(o: number, len: number) {
   const tiltRad = (TILT * Math.PI) / 180;
   const x = diskX;
   const y = diskY * Math.cos(tiltRad); // vertical on screen (ellipse)
-  const z = diskY * Math.sin(tiltRad); // +z = toward viewer (front)
+  // Flatten z so donuts render at near-uniform apparent size (less 3D
+  // foreshortening, more like the flat grid display).
+  const z = 0;
 
   // Depth factor: 0 at front, 1 at back.
   const depth = (1 - Math.cos(rad)) / 2;
@@ -121,7 +123,7 @@ function DonutCard3D({
         zIndex,
         transformStyle: "preserve-3d",
       }}
-      className="absolute left-1/2 top-1/2 flex aspect-square w-[280px] -translate-x-1/2 -translate-y-1/2 items-center justify-center sm:w-[320px]"
+      className="absolute left-1/2 top-1/2 flex h-56 w-56 -translate-x-1/2 -translate-y-1/2 items-center justify-center sm:h-72 sm:w-72"
       aria-label={donut.name}
     >
       <img
