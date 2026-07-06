@@ -130,21 +130,24 @@ export function DetailModal() {
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && closeDetail()}>
-      <DialogContent className="max-h-[94vh] w-full max-w-3xl overflow-hidden border-none bg-[var(--color-dowgnut-lime-bright)] p-0 shadow-2xl sm:rounded-[2rem]">
+      <DialogContent
+        showCloseButton={false}
+        className="!max-w-none !w-screen !h-screen !max-h-none !rounded-none !border-none !p-0 !shadow-none !gap-0 !translate-x-0 !translate-y-0 !left-0 !top-0 overflow-y-auto bg-[var(--color-dowgnut-lime-bright)]"
+      >
         <DialogTitle className="sr-only">{donut.name}</DialogTitle>
 
         {/* Close */}
         <button
           onClick={closeDetail}
           aria-label="Close"
-          className="absolute right-4 top-4 z-30 inline-flex size-10 items-center justify-center rounded-full bg-[var(--color-dowgnut-blue-dark)]/10 text-[var(--color-dowgnut-blue-dark)] transition-colors hover:bg-[var(--color-dowgnut-blue-dark)]/20"
+          className="fixed right-4 top-4 z-30 inline-flex size-10 items-center justify-center rounded-full bg-[var(--color-dowgnut-blue-dark)]/10 text-[var(--color-dowgnut-blue-dark)] transition-colors hover:bg-[var(--color-dowgnut-blue-dark)]/20"
         >
           <X className="size-5" />
         </button>
 
-        <div className="grid max-h-[94vh] grid-cols-1 overflow-y-auto scrollbar-dowgnut md:grid-cols-2">
+        <div className="grid min-h-screen grid-cols-1 md:grid-cols-2">
           {/* Left: big rotating donut — frameless */}
-          <div className="relative flex min-h-[320px] items-center justify-center p-6 md:min-h-[480px]">
+          <div className="relative flex min-h-[40vh] items-center justify-center p-6 md:min-h-screen">
             <button
               onClick={onFav}
               aria-label={fav ? "Remove favorite" : "Add favorite"}
@@ -179,7 +182,7 @@ export function DetailModal() {
           </div>
 
           {/* Right: minimal details */}
-          <div className="flex flex-col gap-5 px-6 py-8 sm:px-10 sm:py-10 md:px-8">
+          <div className="flex flex-col gap-5 px-6 py-8 sm:px-10 sm:py-12 md:min-h-screen md:justify-center md:px-12 lg:px-16">
             {/* Type + rating — minimal line */}
             <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-dowgnut-blue-dark)]/50">
               <span>{donut.type}</span>
