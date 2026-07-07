@@ -42,7 +42,8 @@ const TYPE_ACCENT: Record<string, string> = {
 };
 
 export function DonutSlider() {
-  const donuts = useShop((s) => s.donuts);
+  const allDonuts = useShop((s) => s.donuts);
+  const filterType = useShop((s) => s.filterType);
   const loadingDonuts = useShop((s) => s.loadingDonuts);
   const isFavorite = useShop((s) => s.isFavorite);
   const toggleFavorite = useShop((s) => s.toggleFavorite);
@@ -50,11 +51,26 @@ export function DonutSlider() {
   const openDetail = useShop((s) => s.openDetail);
   const { toast } = useToast();
 
+  // Respect the active type filter — if "classic" is selected, only show
+  // classic donuts in the slider so the user browses flavors within that type.
+  const donuts =
+    filterType && filterType !== "all"
+      ? allDonuts.filter((d) => d.type === filterType)
+      : allDonuts;
+
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [qty, setQty] = useState(1);
   const [dragging, setDragging] = useState(false);
   const [prevIndex, setPrevIndex] = useState(0);
+
+  // Reset index when the filtered list changes (different type selected).
+  const [prevFilter, setPrevFilter] = useState(filterType);
+  if (filterType !== prevFilter) {
+    setPrevFilter(filterType);
+    setIndex(0);
+    setQty(1);
+  }
 
   // Reset qty when donut changes (adjust-state-during-render pattern).
   if (index !== prevIndex) {
@@ -299,7 +315,7 @@ export function DonutSlider() {
       </div>
 
       <p className="mt-2 text-center text-[11px] font-medium uppercase tracking-wider text-[var(--color-dowgnut-blue-dark)]/40">
-        ← swipe to browse • {index + 1} of {donuts.length} →
+        {filterType && filterType !== "all" ? `${filterType} flavors · ` : ""}{index + 1} of {donuts.length} · swipe to browse
       </p>
     </section>
   );
