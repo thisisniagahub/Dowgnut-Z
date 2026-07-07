@@ -25,6 +25,10 @@ export const metadata: Metadata = {
     "Order fresh donuts delivered to your door. Touch 'n Go, DuitNow, card payment. Bold, playful, authentic.",
   applicationName: "DowgNut",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
