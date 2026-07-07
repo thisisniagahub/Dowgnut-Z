@@ -5,6 +5,7 @@ import { Heart, Plus, Star } from "lucide-react";
 import { useShop } from "@/store/use-shop";
 import { useToast } from "@/hooks/use-toast";
 import { celebrateAddToCart, celebrateFavorite } from "@/lib/celebrations";
+import { playAddToCart, playFavorite } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import type { Donut } from "@/lib/types";
 
@@ -48,6 +49,7 @@ export function DonutCard({ donut }: DonutCardProps) {
     });
     if (!wasFav) {
       celebrateFavorite(e.currentTarget as HTMLElement);
+      playFavorite();
     }
   };
 
@@ -57,6 +59,7 @@ export function DonutCard({ donut }: DonutCardProps) {
       await addToCart(donut.id, 1);
       toast({ title: "Added to cart!", description: `${donut.name} × 1` });
       celebrateAddToCart(e.currentTarget as HTMLElement, donut.imgUrl);
+      playAddToCart();
     } catch {
       toast({ title: "Couldn't add to cart", variant: "destructive" });
     }

@@ -3,6 +3,8 @@
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { useShop } from "@/store/use-shop";
+import { useGamification } from "@/store/use-gamification";
+import { ParticleBackground } from "./particle-background";
 import { cn } from "@/lib/utils";
 import type { Donut } from "@/lib/types";
 
@@ -16,6 +18,9 @@ export function ShopHome() {
   const donuts = useShop((s) => s.donuts);
   const setFilterType = useShop((s) => s.setFilterType);
   const setView = useShop((s) => s.setView);
+  const streak = useGamification((s) => s.streak);
+  const badges = useGamification((s) => s.getBadges());
+  const earnedBadges = badges.filter((b) => b.earned);
 
   const typePreview: Record<string, Donut | undefined> = {
     classic: donuts.find((d) => d.type === "classic"),
@@ -24,13 +29,16 @@ export function ShopHome() {
   };
 
   return (
-    <div className="flex flex-1 flex-col px-4 pt-4 sm:px-6">
-      {/* Hero heading — staggered reveal */}
+    <div className="relative flex flex-1 flex-col px-4 pt-4 sm:px-6">
+      {/* Floating sprinkle particles */}
+      <ParticleBackground count={30} />
+
+      {/* Hero heading */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="mb-4 text-center"
+        className="relative mb-4 text-center"
       >
         <h1 className="graffiti-text text-2xl text-[var(--color-dowgnut-blue-dark)] sm:text-3xl">
           Pick your style
@@ -38,10 +46,21 @@ export function ShopHome() {
         <p className="mt-1 text-xs text-[var(--color-dowgnut-blue-dark)]/50">
           Tap a donut type to browse flavors
         </p>
+        {streak > 0 && (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="mt-2 inline-flex items-center gap-1 rounded-full bg-[var(--color-dowgnut-pink)]/10 px-3 py-1"
+          >
+            <span className="text-xs font-bold text-[var(--color-dowgnut-pink-dark)]">
+              🔥 {streak} day streak
+            </span>
+          </motion.div>
+        )}
       </motion.div>
 
-      {/* 3 type cards — staggered entrance with glassmorphism */}
-      <div className="flex flex-col gap-3">
+      {/* 3 type cards */}
+      <div className="relative flex flex-col gap-3">
         {TYPES.map((t, i) => {
           const preview = typePreview[t.key];
           return (
@@ -53,17 +72,12 @@ export function ShopHome() {
               }}
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{
-                delay: 0.15 + i * 0.1,
-                type: "spring",
-                stiffness: 200,
-                damping: 20,
-              }}
+              transition={{ delay: 0.15 + i * 0.1, type: "spring", stiffness: 200, damping: 20 }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               className={cn(
                 "group relative flex items-center gap-4 overflow-hidden bg-gradient-to-br p-4 backdrop-blur-sm",
-                "border border-white/30 rounded-2xl shadow-sm",
+                "glass-card border border-white/30",
                 t.bg
               )}
             >
@@ -78,23 +92,33 @@ export function ShopHome() {
                 />
               )}
               <div className="flex-1 text-left">
-                <p className="text-lg font-black" style={{ color: t.accent }}>
-                  {t.label}
-                </p>
-                <p className="text-xs font-medium text-[var(--color-dowgnut-blue-dark)]/60">
-                  {t.desc}
-                </p>
+                <p className="text-lg font-black" style={{ color: t.accent }}>{t.label}</p>
+                <p className="text-xs font-medium text-[var(--color-dowgnut-blue-dark)]/60">{t.desc}</p>
               </div>
-              <motion.div
-                animate={{ x: [0, 4, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              >
+              <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
                 <ChevronRight className="size-5" style={{ color: t.accent }} />
               </motion.div>
             </motion.button>
           );
         })}
       </div>
+
+      {/* Badges row */}
+      {earnedBadges.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="relative mt-4 flex flex-wrap justify-center gap-2"
+        >
+          {earnedBadges.map((b: any) => (
+            <span key={b.id} className="inline-flex items-center gap-1 rounded-full bg-white/60 px-2 py-1 text-xs font-bold text-[var(--color-dowgnut-blue-dark)] backdrop-blur-sm">
+              {b.emoji} {b.label}
+            </span>
+          ))}
+        </motion.div>
+      )}
     </div>
   );
 }
+

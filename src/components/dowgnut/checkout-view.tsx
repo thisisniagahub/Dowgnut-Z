@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { ArrowLeft, Loader2, ShoppingBag, Truck, Check, ShieldCheck } from "lucide-react";
 import { useShop } from "@/store/use-shop";
+import { useGamification } from "@/store/use-gamification";
+import { celebrateOrderComplete } from "@/lib/celebrations";
+import { playOrderComplete } from "@/lib/sounds";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -55,6 +58,7 @@ export function CheckoutView() {
   const checkout = useShop((s) => s.checkout);
   const setView = useShop((s) => s.setView);
   const startTracking = useShop((s) => s.startTracking);
+  const recordOrder = useGamification((s) => s.recordOrder);
   const { toast } = useToast();
 
   const [form, setForm] = useState({
@@ -102,8 +106,14 @@ export function CheckoutView() {
       const order = await checkout(form);
       toast({
         title: "Payment successful! 🍩",
-        description: `Order RM{order.id.slice(0, 8)} paid via RM{PAYMENTS.find((p) => p.id === payment)?.name}.`,
+        description: `Order ${order.id.slice(0, 8)} paid via ${PAYMENTS.find((p) => p.id === payment)?.name}.`,
       });
+      // Celebrate + gamification
+      celebrateOrderComplete();
+      playOrderComplete();
+      const donutNames = order.items.map((i: any) => i.name);
+      const types = cart.map((c) => c.donut.type);
+      recordOrder(donutNames, types);
       startTracking(order.id, form.customerName);
     } catch (err: any) {
       toast({
