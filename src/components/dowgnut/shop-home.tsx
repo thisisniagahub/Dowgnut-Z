@@ -22,7 +22,7 @@ export function ShopHome() {
   };
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6">
+    <div className="flex flex-1 flex-col items-center justify-center gap-2 overflow-hidden px-6">
       {TYPES.map((t) => {
         const preview = typePreview[t.key];
         return (
@@ -38,7 +38,7 @@ export function ShopHome() {
               <img
                 src={preview.imgUrl}
                 alt={t.label}
-                className="size-28 object-contain sm:size-32"
+                className="size-44 object-contain sm:size-52"
                 draggable={false}
               />
             )}
