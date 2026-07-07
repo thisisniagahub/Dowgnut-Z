@@ -61,24 +61,24 @@ export function DonutCard({ donut }: DonutCardProps) {
           openDetail(donut);
         }
       }}
-      className="group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-[var(--color-dowgnut-blue-dark)]/8 bg-[var(--color-dowgnut-cream)] shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+      className="group relative flex cursor-pointer flex-col"
     >
       {/* Favorite */}
       <button
         onClick={onFav}
         aria-label={fav ? "Remove from favorites" : "Add to favorites"}
         className={cn(
-          "absolute right-2 top-2 z-10 inline-flex size-8 items-center justify-center rounded-full shadow-sm transition-colors",
+          "absolute right-1 top-1 z-10 inline-flex size-8 items-center justify-center transition-colors",
           fav
-            ? "bg-[var(--color-dowgnut-pink)] text-white"
-            : "bg-white/90 text-[var(--color-dowgnut-pink)] hover:bg-white"
+            ? "text-[var(--color-dowgnut-pink)]"
+            : "text-[var(--color-dowgnut-blue-dark)]/30 hover:text-[var(--color-dowgnut-pink)]"
         )}
       >
-        <Heart className={cn("size-4", fav && "fill-current")} />
+        <Heart className={cn("size-5", fav && "fill-current")} />
       </button>
 
-      {/* Image */}
-      <div className="relative flex aspect-square items-center justify-center bg-white p-3">
+      {/* Image — frameless */}
+      <div className="relative flex aspect-square items-center justify-center p-2">
         <img
           src={donut.imgUrl}
           alt={donut.name}
@@ -86,14 +86,14 @@ export function DonutCard({ donut }: DonutCardProps) {
           loading="lazy"
         />
         {donut.featured && (
-          <span className="absolute bottom-2 left-2 inline-flex items-center rounded-full bg-[var(--color-dowgnut-pink)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shadow-sm">
+          <span className="absolute bottom-1 left-1 rounded-full bg-[var(--color-dowgnut-pink)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">
             ★ Hot
           </span>
         )}
       </div>
 
       {/* Body */}
-      <div className="flex flex-1 flex-col gap-1 p-2.5">
+      <div className="flex flex-1 flex-col gap-1 px-1 pb-1">
         <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-tight text-[var(--color-dowgnut-blue-dark)]">
           {donut.name}
         </h3>
@@ -123,7 +123,7 @@ export function DonutCard({ donut }: DonutCardProps) {
           onClick={onAdd}
           disabled={donut.stock <= 0}
           aria-label={`Add ${donut.name} to cart`}
-          className="mt-1.5 inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-full bg-[var(--color-dowgnut-pink)] text-xs font-bold text-white shadow-sm transition-all hover:bg-[var(--color-dowgnut-pink-dark)] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-1.5 inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-full bg-[var(--color-dowgnut-pink)] text-xs font-bold text-white transition-all hover:bg-[var(--color-dowgnut-pink-dark)] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Plus className="size-3.5" /> Add
         </button>

@@ -29,7 +29,7 @@ export function DowgnutHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--color-dowgnut-blue-dark)]/10 bg-[var(--color-dowgnut-blue)] text-white">
+    <header className="sticky top-0 z-40 bg-[var(--color-dowgnut-blue)] text-white">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6">
         {/* Left: logo */}
         <button

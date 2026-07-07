@@ -17,10 +17,7 @@ export function DonutGrid() {
     return (
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div
-            key={i}
-            className="rounded-2xl border border-[var(--color-dowgnut-blue-dark)]/8 bg-[var(--color-dowgnut-cream)] p-3"
-          >
+          <div key={i} className="flex flex-col p-3">
             <Skeleton className="aspect-square w-full rounded-xl bg-[var(--color-dowgnut-lime)]/40" />
             <Skeleton className="mt-2 h-3 w-3/4 rounded-full" />
             <Skeleton className="mt-1.5 h-3 w-1/2 rounded-full" />

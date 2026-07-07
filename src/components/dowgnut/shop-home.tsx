@@ -64,14 +64,14 @@ export function ShopHome() {
 
   return (
     <div className="flex flex-col gap-5 px-4 pt-4 sm:px-6">
-      {/* Search bar */}
+      {/* Search bar — frameless */}
       <div className="relative">
         <Search className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-[var(--color-dowgnut-blue-dark)]/40" />
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search donuts…"
-          className="h-11 rounded-2xl border-[var(--color-dowgnut-blue-dark)]/10 bg-white pl-11 pr-10 text-base shadow-sm"
+          className="h-11 rounded-full bg-[var(--color-dowgnut-cream)] pl-11 pr-10 text-base focus-visible:bg-[var(--color-dowgnut-cream)]"
         />
         {search && (
           <button
@@ -84,13 +84,10 @@ export function ShopHome() {
         )}
       </div>
 
-      {/* Promo strip */}
+      {/* Promo strip — frameless */}
       <div className="grid grid-cols-3 gap-2">
         {PROMOS.map((p) => (
-          <div
-            key={p.title}
-            className="flex flex-col items-center gap-0.5 rounded-xl bg-white p-2 text-center shadow-sm"
-          >
+          <div key={p.title} className="flex flex-col items-center gap-0.5 p-1 text-center">
             <p.icon className="size-4 text-[var(--color-dowgnut-pink)]" />
             <p className="text-[10px] font-bold leading-tight text-[var(--color-dowgnut-blue-dark)]">{p.title}</p>
             <p className="text-[9px] text-[var(--color-dowgnut-blue-dark)]/50">{p.desc}</p>
@@ -98,7 +95,7 @@ export function ShopHome() {
         ))}
       </div>
 
-      {/* 3 donut types — tap to browse flavors (Video 2 concept) */}
+      {/* 3 donut types — frameless, gradient only */}
       <div>
         <h2 className="graffiti-text mb-3 text-lg text-[var(--color-dowgnut-blue-dark)]">
           Pick your style
@@ -111,11 +108,10 @@ export function ShopHome() {
                 key={t.key}
                 onClick={() => openTypeSlider(t.key)}
                 className={cn(
-                  "group relative flex flex-col items-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-br p-4 text-center shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md",
+                  "group relative flex flex-col items-center gap-2 overflow-hidden bg-gradient-to-br p-4 text-center transition-all hover:-translate-y-0.5",
                   t.bg
                 )}
               >
-                {/* Donut preview image */}
                 {preview && (
                   <img
                     src={preview.imgUrl}
@@ -144,7 +140,7 @@ export function ShopHome() {
         </div>
       </div>
 
-      {/* All donuts grid (still available for direct browsing) */}
+      {/* All donuts grid */}
       <div>
         <div className="mb-3 flex items-center justify-between">
           <h2 className="graffiti-text text-lg text-[var(--color-dowgnut-blue-dark)]">
@@ -158,7 +154,7 @@ export function ShopHome() {
           </button>
         </div>
 
-        {/* Category pills — for filtering the grid */}
+        {/* Category pills — frameless */}
         <div className="-mx-4 mb-3 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-dowgnut sm:mx-0 sm:px-0">
           {[
             { key: "all", label: "All", emoji: "🍩" },
@@ -173,8 +169,8 @@ export function ShopHome() {
                 className={cn(
                   "inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3.5 text-sm font-semibold transition-all",
                   active
-                    ? "bg-[var(--color-dowgnut-blue-dark)] text-white shadow-sm"
-                    : "bg-white text-[var(--color-dowgnut-blue-dark)] shadow-sm"
+                    ? "bg-[var(--color-dowgnut-blue-dark)] text-white"
+                    : "text-[var(--color-dowgnut-blue-dark)]/60 hover:text-[var(--color-dowgnut-blue-dark)]"
                 )}
               >
                 <span className="text-sm">{c.emoji}</span>

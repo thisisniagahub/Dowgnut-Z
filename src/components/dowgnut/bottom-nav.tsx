@@ -27,7 +27,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 border-t border-[var(--color-dowgnut-blue-dark)]/10 bg-[var(--color-dowgnut-cream)] pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_12px_rgba(7,51,79,0.08)]"
+      className="fixed bottom-0 left-0 right-0 z-40 bg-[var(--color-dowgnut-cream)]/95 backdrop-blur pb-[env(safe-area-inset-bottom)]"
       aria-label="Bottom navigation"
     >
       <div className="mx-auto flex h-16 max-w-md items-center justify-around px-2">
