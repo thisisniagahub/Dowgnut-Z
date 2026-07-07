@@ -34,12 +34,16 @@ export default function Home() {
       <main className="flex flex-1 flex-col overflow-hidden pb-16">
         {view === "shop" && <ShopHome />}
         {view === "slider" && <DonutSlider />}
-        {view === "swipe" && <SwipeView />}
-        {view === "favorites" && <FavoritesView />}
-        {view === "checkout" && <CheckoutView />}
-        {view === "orders" && <OrdersView />}
-        {view === "tracking" && <OrderTrackingView />}
-        {view === "admin" && <AdminDashboard />}
+        {view !== "shop" && view !== "slider" && (
+          <>
+            {view === "swipe" && <SwipeView />}
+            {view === "favorites" && <FavoritesView />}
+            {view === "checkout" && <CheckoutView />}
+            {view === "orders" && <OrdersView />}
+            {view === "tracking" && <OrderTrackingView />}
+            {view === "admin" && <AdminDashboard />}
+          </>
+        )}
       </main>
 
       {/* No footer, no bottom nav on shop view — clean minimal first screen */}
