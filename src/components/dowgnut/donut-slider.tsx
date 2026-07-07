@@ -6,6 +6,7 @@ import {
   AnimatePresence,
   useMotionValue,
   useTransform,
+  useMotionValueEvent,
   animate,
   type PanInfo,
 } from "framer-motion";
@@ -117,6 +118,13 @@ export function DonutSlider() {
   const [dragging, setDragging] = useState(false);
   const [prevCenter, setPrevCenter] = useState(0);
 
+  // Sync center with position in real-time — nama/info update serentak
+  // dengan ring rotation (semasa drag AND snap animation).
+  useMotionValueEvent(position, "change", (p) => {
+    const wrapped = ((Math.round(p) % len) + len) % len;
+    setCenter((prev) => (prev !== wrapped ? wrapped : prev));
+  });
+
   if (len > 0 && center >= len) {
     setCenter(0);
     if (position.get() > len) position.set(0);
@@ -135,8 +143,7 @@ export function DonutSlider() {
       damping: 30,
       mass: 0.8,
     });
-    const wrapped = ((targetInt % len) + len) % len;
-    setCenter(wrapped);
+    // center akan auto-update via useMotionValueEvent di atas
   };
 
   const go = (dir: number) => {
