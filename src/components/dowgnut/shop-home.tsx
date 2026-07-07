@@ -22,34 +22,32 @@ export function ShopHome() {
   };
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-6">
-      <div className="flex w-full max-w-xs flex-col gap-4">
-        {TYPES.map((t) => {
-          const preview = typePreview[t.key];
-          return (
-            <button
-              key={t.key}
-              onClick={() => {
-                setFilterType(t.key);
-                setView("slider");
-              }}
-              className="flex flex-col items-center gap-1"
-            >
-              {preview && (
-                <img
-                  src={preview.imgUrl}
-                  alt={t.label}
-                  className="size-24 object-contain"
-                  draggable={false}
-                />
-              )}
-              <span className="text-xs font-medium text-[var(--color-dowgnut-blue-dark)]">
-                {t.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
+    <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6">
+      {TYPES.map((t) => {
+        const preview = typePreview[t.key];
+        return (
+          <button
+            key={t.key}
+            onClick={() => {
+              setFilterType(t.key);
+              setView("slider");
+            }}
+            className="flex flex-1 flex-col items-center justify-center"
+          >
+            {preview && (
+              <img
+                src={preview.imgUrl}
+                alt={t.label}
+                className="size-28 object-contain sm:size-32"
+                draggable={false}
+              />
+            )}
+            <span className="mt-1 text-xs font-medium text-[var(--color-dowgnut-blue-dark)]/60">
+              {t.label}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }
