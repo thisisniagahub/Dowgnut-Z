@@ -31,7 +31,7 @@ export default function Home() {
     <>
       <SplashScreen />
       <DowgnutHeader />
-      <main className="flex flex-1 flex-col pb-16">
+      <main className="flex flex-1 flex-col overflow-hidden pb-16">
         {view === "shop" && <ShopHome />}
         {view === "slider" && <DonutSlider />}
         {view === "swipe" && <SwipeView />}
@@ -42,9 +42,9 @@ export default function Home() {
         {view === "admin" && <AdminDashboard />}
       </main>
 
-      {/* No footer on shop view — keeps first screen clean & no-scroll */}
+      {/* No footer, no bottom nav on shop view — clean minimal first screen */}
       {view !== "shop" && <DowgnutFooter />}
-      <BottomNav />
+      {view !== "shop" && <BottomNav />}
 
       {/* Overlays */}
       <DetailModal />

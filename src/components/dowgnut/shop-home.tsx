@@ -23,7 +23,7 @@ export function ShopHome() {
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-6">
-      <div className="flex w-full max-w-sm flex-col gap-8">
+      <div className="flex w-full max-w-xs flex-col gap-4">
         {TYPES.map((t) => {
           const preview = typePreview[t.key];
           return (
@@ -33,17 +33,17 @@ export function ShopHome() {
                 setFilterType(t.key);
                 setView("slider");
               }}
-              className="flex flex-col items-center gap-2"
+              className="flex flex-col items-center gap-1"
             >
               {preview && (
                 <img
                   src={preview.imgUrl}
                   alt={t.label}
-                  className="size-32 object-contain"
+                  className="size-24 object-contain"
                   draggable={false}
                 />
               )}
-              <span className="text-sm font-medium text-[var(--color-dowgnut-blue-dark)]">
+              <span className="text-xs font-medium text-[var(--color-dowgnut-blue-dark)]">
                 {t.label}
               </span>
             </button>
