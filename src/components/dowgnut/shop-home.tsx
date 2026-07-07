@@ -19,8 +19,15 @@ export function ShopHome() {
   const setFilterType = useShop((s) => s.setFilterType);
   const setView = useShop((s) => s.setView);
   const streak = useGamification((s) => s.streak);
-  const badges = useGamification((s) => s.getBadges());
-  const earnedBadges = badges.filter((b) => b.earned);
+  const orderedTypes = useGamification((s) => s.orderedTypes);
+  const orderedDonutNames = useGamification((s) => s.orderedDonutNames);
+  const earnedBadges = [
+    { id: "first-order", label: "First Bite", emoji: "🍩", earned: orderedDonutNames.length > 0 },
+    { id: "streak-3", label: "On a Roll", emoji: "🔥", earned: streak >= 3 },
+    { id: "try-all-types", label: "Explorer", emoji: "🗺️", earned: orderedTypes.length >= 4 },
+    { id: "try-10", label: "Taste Tester", emoji: "👅", earned: orderedDonutNames.length >= 10 },
+    { id: "try-all", label: "Donut Master", emoji: "👑", earned: orderedDonutNames.length >= 21 },
+  ].filter((b) => b.earned);
 
   const typePreview: Record<string, Donut | undefined> = {
     classic: donuts.find((d) => d.type === "classic"),
