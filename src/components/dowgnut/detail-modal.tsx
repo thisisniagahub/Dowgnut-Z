@@ -74,7 +74,7 @@ export function DetailModal() {
       await addToCart(donut.id, qty);
       toast({
         title: buyNow ? "Added — opening cart" : "Added to your dowgs!",
-        description: `${donut.name} × ${qty}`,
+        description: `RM{donut.name} × RM{qty}`,
       });
       if (buyNow) {
         closeDetail();
@@ -202,7 +202,7 @@ export function DetailModal() {
 
             {/* Price — bold, clean */}
             <p className="text-2xl font-black text-[var(--color-dowgnut-pink-dark)]">
-              ${donut.price.toFixed(2)}
+              RM{donut.price.toFixed(2)}
             </p>
 
             {/* Description — minimal */}
@@ -252,7 +252,7 @@ export function DetailModal() {
                 disabled={donut.stock <= 0}
                 className="h-12 w-full rounded-full bg-[var(--color-dowgnut-blue-dark)] text-sm font-semibold uppercase tracking-[0.15em] text-white hover:bg-[var(--color-dowgnut-blue)]"
               >
-                Add to cart · ${(donut.price * qty).toFixed(2)}
+                Add to cart · RM{(donut.price * qty).toFixed(2)}
               </Button>
               <button
                 onClick={() => onAdd(false)}
@@ -370,7 +370,7 @@ export function DetailModal() {
                     {d.name}
                   </span>
                   <span className="text-xs font-bold text-[var(--color-dowgnut-pink-dark)]">
-                    ${d.price.toFixed(2)}
+                    RM{d.price.toFixed(2)}
                   </span>
                 </button>
               ))}

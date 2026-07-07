@@ -90,7 +90,7 @@ export function CheckoutView() {
     if (missing.length > 0) {
       toast({
         title: "Mind the gaps",
-        description: `Missing: ${missing.join(", ")}`,
+        description: `Missing: RM{missing.join(", ")}`,
         variant: "destructive",
       });
       return;
@@ -102,7 +102,7 @@ export function CheckoutView() {
       const order = await checkout(form);
       toast({
         title: "Payment successful! 🍩",
-        description: `Order ${order.id.slice(0, 8)} paid via ${PAYMENTS.find((p) => p.id === payment)?.name}.`,
+        description: `Order RM{order.id.slice(0, 8)} paid via RM{PAYMENTS.find((p) => p.id === payment)?.name}.`,
       });
       startTracking(order.id, form.customerName);
     } catch (err: any) {
@@ -251,24 +251,24 @@ export function CheckoutView() {
                 <img src={item.donut.imgUrl} alt={item.donut.name} className="size-12 object-contain" />
                 <div className="flex min-w-0 flex-1 flex-col">
                   <span className="line-clamp-1 text-sm font-bold text-[var(--color-dowgnut-blue-dark)]">{item.donut.name}</span>
-                  <span className="text-xs text-[var(--color-dowgnut-blue-dark)]/60">{item.quantity} × ${item.donut.price.toFixed(2)}</span>
+                  <span className="text-xs text-[var(--color-dowgnut-blue-dark)]/60">{item.quantity} × RM{item.donut.price.toFixed(2)}</span>
                 </div>
-                <span className="text-sm font-bold text-[var(--color-dowgnut-blue-dark)]">${(item.donut.price * item.quantity).toFixed(2)}</span>
+                <span className="text-sm font-bold text-[var(--color-dowgnut-blue-dark)]">RM{(item.donut.price * item.quantity).toFixed(2)}</span>
               </li>
             ))}
           </ul>
           <div className="mt-2 space-y-1 border-t border-[var(--color-dowgnut-blue-dark)]/10 pt-3 text-sm">
             <div className="flex justify-between text-[var(--color-dowgnut-blue-dark)]/80">
               <span>Subtotal</span>
-              <span className="font-semibold">${subtotal.toFixed(2)}</span>
+              <span className="font-semibold">RM{subtotal.toFixed(2)}</span>
             </div>
             <div className="flex items-center justify-between text-[var(--color-dowgnut-blue-dark)]/80">
               <span className="inline-flex items-center gap-1"><Truck className="size-4" /> Delivery</span>
-              <span className="font-semibold">{delivery === 0 ? "FREE" : `$${delivery.toFixed(2)}`}</span>
+              <span className="font-semibold">{delivery === 0 ? "FREE" : `RMRM{delivery.toFixed(2)}`}</span>
             </div>
             <div className="mt-2 flex justify-between border-t border-[var(--color-dowgnut-blue-dark)]/10 pt-2 text-base font-bold text-[var(--color-dowgnut-blue-dark)]">
               <span>Total</span>
-              <span>${total.toFixed(2)}</span>
+              <span>RM{total.toFixed(2)}</span>
             </div>
           </div>
           <Button
@@ -279,7 +279,7 @@ export function CheckoutView() {
             {submitting ? (
               <><Loader2 className="size-5 animate-spin" /> Processing payment…</>
             ) : (
-              <>Pay ${total.toFixed(2)} with {PAYMENTS.find((p) => p.id === payment)?.name}</>
+              <>Pay RM{total.toFixed(2)} with {PAYMENTS.find((p) => p.id === payment)?.name}</>
             )}
           </Button>
         </Card>

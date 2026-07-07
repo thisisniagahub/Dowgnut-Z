@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Heart, HeartOff, Plus, Star } from "lucide-react";
+import { Heart, Plus, Star } from "lucide-react";
 import { useShop } from "@/store/use-shop";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -34,7 +34,7 @@ export function DonutCard({ donut }: DonutCardProps) {
     try {
       await addToCart(donut.id, 1);
       toast({
-        title: "Added to your dowgs!",
+        title: "Added to cart!",
         description: `${donut.name} × 1`,
       });
     } catch {
@@ -61,75 +61,72 @@ export function DonutCard({ donut }: DonutCardProps) {
           openDetail(donut);
         }
       }}
-      className="group relative flex cursor-pointer flex-col"
+      className="group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-[var(--color-dowgnut-blue-dark)]/8 bg-[var(--color-dowgnut-cream)] shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
     >
       {/* Favorite */}
       <button
         onClick={onFav}
         aria-label={fav ? "Remove from favorites" : "Add to favorites"}
         className={cn(
-          "absolute right-1 top-1 z-10 inline-flex size-9 items-center justify-center rounded-full shadow-sm transition-colors",
+          "absolute right-2 top-2 z-10 inline-flex size-8 items-center justify-center rounded-full shadow-sm transition-colors",
           fav
             ? "bg-[var(--color-dowgnut-pink)] text-white"
-            : "bg-white/80 text-[var(--color-dowgnut-pink)] hover:bg-white"
+            : "bg-white/90 text-[var(--color-dowgnut-pink)] hover:bg-white"
         )}
       >
-        {fav ? <Heart className="size-4 fill-current" /> : <HeartOff className="size-4" />}
+        <Heart className={cn("size-4", fav && "fill-current")} />
       </button>
 
-      {/* Image — frameless, floating donut on the page background */}
-      <div className="relative flex aspect-square items-center justify-center">
+      {/* Image */}
+      <div className="relative flex aspect-square items-center justify-center bg-white p-3">
         <img
           src={donut.imgUrl}
           alt={donut.name}
-          className="size-full object-contain transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-3"
+          className="size-full object-contain transition-transform duration-500 group-hover:scale-110"
           loading="lazy"
         />
         {donut.featured && (
-          <span className="absolute bottom-1 left-1 inline-flex items-center rounded-full bg-[var(--color-dowgnut-blue)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
-            ★ Featured
+          <span className="absolute bottom-2 left-2 inline-flex items-center rounded-full bg-[var(--color-dowgnut-pink)] px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shadow-sm">
+            ★ Hot
           </span>
         )}
       </div>
 
       {/* Body */}
-      <div className="mt-2 px-1">
-        <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-bold leading-tight text-[var(--color-dowgnut-blue-dark)]">
+      <div className="flex flex-1 flex-col gap-1 p-2.5">
+        <h3 className="line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-tight text-[var(--color-dowgnut-blue-dark)]">
           {donut.name}
         </h3>
 
-        <div className="mt-1 flex items-center gap-1 text-xs">
-          <Star className="size-3.5 fill-[var(--color-dowgnut-pink)] text-[var(--color-dowgnut-pink)]" />
+        <div className="flex items-center gap-1 text-xs">
+          <Star className="size-3 fill-[var(--color-dowgnut-pink)] text-[var(--color-dowgnut-pink)]" />
           <span className="font-semibold text-[var(--color-dowgnut-blue-dark)]">
             {donut.rating.toFixed(1)}
           </span>
-          <span className="text-[var(--color-dowgnut-blue-dark)]/50">•</span>
-          <span className="text-[var(--color-dowgnut-blue-dark)]/60">{donut.calories} cal</span>
+          <span className="text-[var(--color-dowgnut-blue-dark)]/40">·</span>
+          <span className="text-[var(--color-dowgnut-blue-dark)]/50">{donut.calories}cal</span>
         </div>
 
-        <div className="mt-2 flex items-center justify-between">
-          <span className="inline-flex items-center rounded-full bg-[var(--color-dowgnut-blue)] px-3 py-1 text-sm font-bold text-white">
-            ${donut.price.toFixed(2)}
+        <div className="mt-1 flex items-baseline gap-1">
+          <span className="text-base font-black text-[var(--color-dowgnut-pink-dark)]">
+            RM{donut.price.toFixed(2)}
           </span>
-          <button
-            onClick={onAdd}
-            disabled={donut.stock <= 0}
-            aria-label={`Add ${donut.name} to cart`}
-            className="inline-flex size-10 items-center justify-center rounded-full bg-[var(--color-dowgnut-pink)] text-white shadow-sm transition-transform hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Plus className="size-5" />
-          </button>
         </div>
+
         {donut.stock <= 5 && donut.stock > 0 && (
-          <p className="mt-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-dowgnut-pink-dark)]">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--color-dowgnut-pink-dark)]">
             Only {donut.stock} left!
           </p>
         )}
-        {donut.stock <= 0 && (
-          <p className="mt-1 text-[10px] font-semibold uppercase tracking-wide text-destructive">
-            Sold out
-          </p>
-        )}
+
+        <button
+          onClick={onAdd}
+          disabled={donut.stock <= 0}
+          aria-label={`Add ${donut.name} to cart`}
+          className="mt-1.5 inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-full bg-[var(--color-dowgnut-pink)] text-xs font-bold text-white shadow-sm transition-all hover:bg-[var(--color-dowgnut-pink-dark)] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Plus className="size-3.5" /> Add
+        </button>
       </div>
     </motion.div>
   );

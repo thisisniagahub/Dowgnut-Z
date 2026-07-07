@@ -20,30 +20,18 @@ const archivoBlack = Archivo_Black({
 });
 
 export const metadata: Metadata = {
-  title: "DowgNut — Good Vibes & Good Dowg",
+  title: "DowgNut — Donut Delivery",
   description:
-    "DowgNut — bold, playful, authentic donut shopping. Browse classic, sprinkled, stuffed & specialty donuts. AI Concierge, AI Donut Designer, and live order tracking.",
-  keywords: [
-    "DowgNut",
-    "donut",
-    "doughnut",
-    "donut shop",
-    "AI donut",
-    "online ordering",
-  ],
-  authors: [{ name: "DowgNut" }],
+    "Order fresh donuts delivered to your door. Touch 'n Go, DuitNow, card payment. Bold, playful, authentic.",
   applicationName: "DowgNut",
   manifest: "/manifest.json",
-  openGraph: {
-    title: "DowgNut — Good Vibes & Good Dowg",
-    description: "Bold, playful, authentic donut shopping with AI-powered tools.",
-    siteName: "DowgNut",
-    type: "website",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "DowgNut",
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "DowgNut — Good Vibes & Good Dowg",
-    description: "Bold, playful, authentic donut shopping with AI-powered tools.",
+  formatDetection: {
+    telephone: false,
   },
 };
 
@@ -51,8 +39,18 @@ export const viewport: Viewport = {
   themeColor: "#07579B",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 5,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
 };
+
+const SW_REGISTER = `
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+`;
 
 export default function RootLayout({
   children,
@@ -61,8 +59,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: SW_REGISTER }} />
+      </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${archivoBlack.variable} antialiased bg-background text-foreground min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} ${archivoBlack.variable} antialiased bg-background text-foreground min-h-screen flex flex-col overscroll-none`}
       >
         {children}
         <Toaster />

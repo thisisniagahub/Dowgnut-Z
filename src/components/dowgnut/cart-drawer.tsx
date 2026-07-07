@@ -110,14 +110,14 @@ export function CartDrawer() {
                       </p>
                       <button
                         onClick={() => removeFromCart(item.id)}
-                        aria-label={`Remove ${item.donut.name}`}
+                        aria-label={`Remove RM{item.donut.name}`}
                         className="text-[var(--color-dowgnut-blue-dark)]/40 hover:text-destructive"
                       >
                         <X className="size-4" />
                       </button>
                     </div>
                     <p className="text-xs text-[var(--color-dowgnut-blue)]/70">
-                      ${item.donut.price.toFixed(2)} each
+                      RM{item.donut.price.toFixed(2)} each
                     </p>
                     <div className="mt-auto flex items-center justify-between pt-2">
                       <div className="inline-flex items-center rounded-full border border-[var(--color-dowgnut-blue-dark)]/15 bg-white">
@@ -144,7 +144,7 @@ export function CartDrawer() {
                         </button>
                       </div>
                       <span className="text-sm font-bold text-[var(--color-dowgnut-blue-dark)]">
-                        ${(item.donut.price * item.quantity).toFixed(2)}
+                        RM{(item.donut.price * item.quantity).toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -163,7 +163,7 @@ export function CartDrawer() {
                 <Truck className="size-4 text-[var(--color-dowgnut-blue)]" />
                 {remaining > 0 ? (
                   <span className="text-[var(--color-dowgnut-blue-dark)]">
-                    Add <strong>${remaining.toFixed(2)}</strong> for free delivery
+                    Add <strong>RM{remaining.toFixed(2)}</strong> for free delivery
                   </span>
                 ) : (
                   <span className="font-bold text-[var(--color-dowgnut-pink-dark)]">
@@ -180,17 +180,17 @@ export function CartDrawer() {
             <div className="space-y-1 text-sm">
               <div className="flex justify-between text-[var(--color-dowgnut-blue-dark)]/80">
                 <span>Subtotal</span>
-                <span className="font-semibold">${subtotal.toFixed(2)}</span>
+                <span className="font-semibold">RM{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-[var(--color-dowgnut-blue-dark)]/80">
                 <span>Delivery</span>
                 <span className="font-semibold">
-                  {delivery === 0 ? "FREE" : `$${delivery.toFixed(2)}`}
+                  {delivery === 0 ? "FREE" : `RMRM{delivery.toFixed(2)}`}
                 </span>
               </div>
               <div className="mt-2 flex justify-between border-t border-[var(--color-dowgnut-blue-dark)]/10 pt-2 text-base font-bold text-[var(--color-dowgnut-blue-dark)]">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>RM{total.toFixed(2)}</span>
               </div>
             </div>
 
@@ -198,7 +198,7 @@ export function CartDrawer() {
               onClick={onCheckout}
               className="mt-4 h-12 w-full rounded-full bg-[var(--color-dowgnut-pink)] text-base font-bold text-white hover:bg-[var(--color-dowgnut-pink-dark)] hover:text-white"
             >
-              Checkout • ${total.toFixed(2)}
+              Checkout • RM{total.toFixed(2)}
             </Button>
             <button
               onClick={onClear}
