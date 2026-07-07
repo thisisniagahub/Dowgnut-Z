@@ -81,13 +81,13 @@ function RingCard({
         transformStyle: "preserve-3d",
         rotateX: -TILT,
       }}
-      className="absolute left-1/2 top-1/2 flex h-64 w-64 -translate-x-1/2 -translate-y-1/2 items-center justify-center sm:h-72 sm:w-72"
+      className="absolute left-1/2 top-1/2 flex h-80 w-80 -translate-x-1/2 -translate-y-1/2 items-center justify-center sm:h-96 sm:w-96"
       aria-label={donut.name}
     >
       <img
         src={donut.imgUrl}
         alt={donut.name}
-        className="size-52 object-contain sm:size-60"
+        className="size-72 object-contain sm:size-80"
         draggable={false}
       />
     </motion.button>
@@ -213,8 +213,8 @@ export function DonutSlider() {
 
       {/* 3D ring — all donuts of this type */}
       <div
-        className="relative h-[360px] w-full overflow-hidden"
-        style={{ perspective: "1500px" }}
+        className="relative h-[420px] w-full overflow-hidden"
+        style={{ perspective: "1600px" }}
       >
         <motion.div
           className="absolute inset-0 z-40 cursor-grab touch-pan-y active:cursor-grabbing"
@@ -243,7 +243,7 @@ export function DonutSlider() {
         </div>
       </div>
 
-      {/* Active donut info — compact, minimal, doesn't crowd the ring */}
+      {/* Active donut info — tiny, centered, at the very bottom */}
       <AnimatePresence mode="wait">
         <motion.div
           key={current.id}
@@ -251,70 +251,58 @@ export function DonutSlider() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className="mt-1 flex flex-col gap-1.5"
+          className="mt-auto flex flex-col items-center gap-1 pb-2 text-center"
         >
-          {/* Name + type + rating in one compact line */}
-          <div className="flex items-baseline gap-2">
-            <h2 className="graffiti-text text-base leading-tight text-[var(--color-dowgnut-blue-dark)]">
-              {current.name}
-            </h2>
-            <span className="text-[10px] font-semibold text-[var(--color-dowgnut-blue-dark)]/50">
-              ★ {current.rating.toFixed(1)}
-            </span>
-          </div>
-
-          {/* Nutrition inline — tiny */}
-          <p className="text-[10px] text-[var(--color-dowgnut-blue-dark)]/50">
-            {current.calories} kcal · {current.sugar}g sugar · {current.fat}g fat
+          <h2 className="text-sm font-bold leading-tight text-[var(--color-dowgnut-blue-dark)]">
+            {current.name} <span className="font-normal text-[var(--color-dowgnut-blue-dark)]/40">★{current.rating.toFixed(1)}</span>
+          </h2>
+          <p className="text-[9px] text-[var(--color-dowgnut-blue-dark)]/40">
+            {current.calories} kcal · {current.sugar}g · {current.fat}g
           </p>
-
-          {/* Price + qty + fav — single compact row */}
           <div className="flex items-center gap-2">
-            <span className="text-base font-black text-[var(--color-dowgnut-blue-dark)]">
+            <span className="text-sm font-black text-[var(--color-dowgnut-blue-dark)]">
               RM{(current.price * qty).toFixed(2)}
             </span>
             <button
               onClick={onFav}
               className={cn(
-                "inline-flex size-7 items-center justify-center transition-colors",
+                "inline-flex size-6 items-center justify-center transition-colors",
                 fav ? "text-[var(--color-dowgnut-pink)]" : "text-[var(--color-dowgnut-blue-dark)]/30"
               )}
               aria-label="Toggle favorite"
             >
-              <Heart className={cn("size-4", fav && "fill-current")} />
+              <Heart className={cn("size-3.5", fav && "fill-current")} />
             </button>
-            <div className="ml-auto inline-flex items-center rounded-full border border-[var(--color-dowgnut-blue-dark)]/15">
+            <div className="inline-flex items-center rounded-full border border-[var(--color-dowgnut-blue-dark)]/15">
               <button
                 onClick={() => setQty((q) => Math.max(1, q - 1))}
-                className="inline-flex size-7 items-center justify-center rounded-l-full text-[var(--color-dowgnut-blue-dark)]"
+                className="inline-flex size-6 items-center justify-center rounded-l-full text-[var(--color-dowgnut-blue-dark)]"
                 aria-label="Decrease quantity"
               >
-                <Minus className="size-3" />
+                <Minus className="size-2.5" />
               </button>
-              <span className="min-w-6 text-center text-xs font-bold text-[var(--color-dowgnut-blue-dark)]">{qty}</span>
+              <span className="min-w-5 text-center text-[10px] font-bold text-[var(--color-dowgnut-blue-dark)]">{qty}</span>
               <button
                 onClick={() => setQty((q) => q + 1)}
-                className="inline-flex size-7 items-center justify-center rounded-r-full text-[var(--color-dowgnut-blue-dark)]"
+                className="inline-flex size-6 items-center justify-center rounded-r-full text-[var(--color-dowgnut-blue-dark)]"
                 aria-label="Increase quantity"
               >
-                <Plus className="size-3" />
+                <Plus className="size-2.5" />
               </button>
             </div>
           </div>
-
           <button
             onClick={onAdd}
             disabled={current.stock <= 0}
-            className="inline-flex h-9 w-full items-center justify-center rounded-full bg-[var(--color-dowgnut-pink)] text-xs font-bold text-white transition-all hover:bg-[var(--color-dowgnut-pink-dark)] active:scale-95 disabled:opacity-50"
+            className="inline-flex h-8 w-32 items-center justify-center rounded-full bg-[var(--color-dowgnut-pink)] text-[10px] font-bold text-white transition-all hover:bg-[var(--color-dowgnut-pink-dark)] active:scale-95 disabled:opacity-50"
           >
             Add to Cart
           </button>
+          <p className="text-[8px] uppercase tracking-wider text-[var(--color-dowgnut-blue-dark)]/30">
+            {filterType && filterType !== "all" ? `${filterType} · ` : ""}{center + 1}/{len} · swipe
+          </p>
         </motion.div>
       </AnimatePresence>
-
-      <p className="mt-1 text-center text-[10px] font-medium uppercase tracking-wider text-[var(--color-dowgnut-blue-dark)]/40">
-        {filterType && filterType !== "all" ? `${filterType} · ` : ""}{center + 1}/{len} · swipe
-      </p>
     </section>
   );
 }
