@@ -118,6 +118,16 @@ export function DonutSlider() {
   const [dragging, setDragging] = useState(false);
   const [prevCenter, setPrevCenter] = useState(0);
 
+  // Reset position + center when the filtered donut list changes (different
+  // type selected from home). Prevents "missing donuts" or wrong center.
+  const [prevLen, setPrevLen] = useState(len);
+  if (len !== prevLen) {
+    setPrevLen(len);
+    position.set(0);
+    setCenter(0);
+    setQty(1);
+  }
+
   // Sync center with position in real-time — nama/info update serentak
   // dengan ring rotation (semasa drag AND snap animation).
   useMotionValueEvent(position, "change", (p) => {
