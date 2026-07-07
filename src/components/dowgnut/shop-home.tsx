@@ -52,19 +52,16 @@ export function ShopHome() {
   };
 
   return (
-    <div className="flex flex-1 flex-col justify-center px-4 py-6 sm:px-6">
-      {/* Heading */}
-      <div className="mb-6 text-center">
-        <h1 className="graffiti-text text-3xl leading-none text-[var(--color-dowgnut-blue-dark)] sm:text-4xl">
+    <div className="flex flex-1 flex-col justify-center px-4 sm:px-6">
+      {/* Heading — compact */}
+      <div className="mb-2 text-center">
+        <h1 className="graffiti-text text-xl leading-none text-[var(--color-dowgnut-blue-dark)]">
           Pick your style
         </h1>
-        <p className="mt-2 text-sm text-[var(--color-dowgnut-blue-dark)]/50">
-          Tap a donut type to browse its flavors
-        </p>
       </div>
 
-      {/* 3 donut types — the only content on first screen */}
-      <div className="flex flex-col gap-4">
+      {/* 3 donut types — fit in one screen, no scroll */}
+      <div className="flex flex-col gap-1.5">
         {TYPES.map((t) => {
           const preview = typePreview[t.key];
           return (
@@ -72,7 +69,7 @@ export function ShopHome() {
               key={t.key}
               onClick={() => openTypeSlider(t.key)}
               className={cn(
-                "group relative flex items-center gap-4 overflow-hidden bg-gradient-to-br p-5 text-left transition-all hover:scale-[1.02] active:scale-[0.99]",
+                "group relative flex items-center gap-3 overflow-hidden bg-gradient-to-br p-2 text-left transition-all hover:scale-[1.02] active:scale-[0.99]",
                 t.bg
               )}
             >
@@ -80,19 +77,19 @@ export function ShopHome() {
                 <img
                   src={preview.imgUrl}
                   alt={t.label}
-                  className="size-20 shrink-0 object-contain transition-transform duration-500 group-hover:scale-110"
+                  className="size-24 shrink-0 object-contain transition-transform duration-500 group-hover:scale-110"
                   draggable={false}
                 />
               )}
               <div className="flex-1">
-                <p className="text-xl font-black" style={{ color: t.accent }}>
+                <p className="text-base font-black" style={{ color: t.accent }}>
                   {t.emoji} {t.label}
                 </p>
-                <p className="mt-0.5 text-xs font-medium text-[var(--color-dowgnut-blue-dark)]/60">
+                <p className="mt-0.5 text-[10px] font-medium text-[var(--color-dowgnut-blue-dark)]/60">
                   {t.desc}
                 </p>
               </div>
-              <ChevronRight className="size-6 shrink-0" style={{ color: t.accent }} />
+              <ChevronRight className="size-5 shrink-0" style={{ color: t.accent }} />
             </button>
           );
         })}
