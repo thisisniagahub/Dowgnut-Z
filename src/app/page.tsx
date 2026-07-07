@@ -80,7 +80,8 @@ export default function Home() {
 
       <DetailModal />
       <CartDrawer />
-      <AIConcierge />
+      {/* AI Concierge only on non-shop/slider views (keeps home+slider minimal) */}
+      {view !== "shop" && view !== "slider" && <AIConcierge />}
       <AIDesigner />
     </>
   );
