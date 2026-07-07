@@ -2,42 +2,32 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence, type PanInfo } from "framer-motion";
-import { Heart, Minus, Plus, Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, Minus, Plus, ChevronLeft, ChevronRight, Info } from "lucide-react";
 import { useShop } from "@/store/use-shop";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import type { Donut } from "@/lib/types";
 
 /**
- * DonutSlider — merges concepts from both reference videos:
+ * DonutSlider — shows 3 donuts at once (center big + 2 sides small/blur),
+ * with smooth spring transition between donuts. Merges the multi-donut
+ * display from the 3D carousel with the nutrition + qty + add-to-cart
+ * from the slider concept.
  *
- * Video 1 (Figma tutorial):
- *  - Smooth drag-to-navigate between donuts (Smart animate feel)
- *  - Bold flavor name prominent on screen
- *  - Color-coded background per flavor type
- *
- * Video 2 (Dunats app):
- *  - Nutrition info (Sugar, Fat, Energy/Calories)
- *  - Minimalist details overlay
- *  - Quantity controls (+/−)
- *  - Add to Cart prominent
- *
- * Result: swipe through donuts one-by-one. Each donut has a color-coded
- * background, bold name, nutrition breakdown, qty stepper, and add-to-cart.
+ * Drag or arrows to navigate. Center donut shows full details.
  */
 
-// Color-coded backgrounds per donut type (from Video 1 concept).
-const TYPE_BG: Record<string, string> = {
-  classic: "from-[#FFF0E0] to-[#FFE0C0]",
-  sprinkled: "from-[#FFE0F0] to-[#FFC0E0]",
-  stuffed: "from-[#E0F0FF] to-[#C0E0FF]",
-  specialty: "from-[#E8F866] to-[#F7FFD6]",
+// Soft background tints per type.
+const TYPE_TINT: Record<string, string> = {
+  classic: "#FFF7ED",
+  sprinkled: "#FDF2F8",
+  stuffed: "#EFF6FF",
+  specialty: "#FEFCE8",
 };
 
 const TYPE_ACCENT: Record<string, string> = {
-  classic: "#D4B36A",
-  sprinkled: "#F05A9B",
-  stuffed: "#07579B",
+  classic: "#92400E",
+  sprinkled: "#BE185D",
+  stuffed: "#1E40AF",
   specialty: "#07334F",
 };
 
@@ -51,8 +41,7 @@ export function DonutSlider() {
   const openDetail = useShop((s) => s.openDetail);
   const { toast } = useToast();
 
-  // Respect the active type filter — if "classic" is selected, only show
-  // classic donuts in the slider so the user browses flavors within that type.
+  // Respect the active type filter.
   const donuts =
     filterType && filterType !== "all"
       ? allDonuts.filter((d) => d.type === filterType)
@@ -63,22 +52,20 @@ export function DonutSlider() {
   const [qty, setQty] = useState(1);
   const [dragging, setDragging] = useState(false);
   const [prevIndex, setPrevIndex] = useState(0);
-
-  // Reset index when the filtered list changes (different type selected).
   const [prevFilter, setPrevFilter] = useState(filterType);
+
+  // Reset index when filter changes.
   if (filterType !== prevFilter) {
     setPrevFilter(filterType);
     setIndex(0);
     setQty(1);
   }
 
-  // Reset qty when donut changes (adjust-state-during-render pattern).
+  // Reset qty when donut changes.
   if (index !== prevIndex) {
     setPrevIndex(index);
     setQty(1);
   }
-
-  const current = donuts[index];
 
   if (loadingDonuts && donuts.length === 0) {
     return (
@@ -98,6 +85,9 @@ export function DonutSlider() {
     );
   }
 
+  const current = donuts[index];
+  if (!current) return null;
+
   const go = (dir: number) => {
     setDirection(dir);
     setIndex((i) => (i + dir + donuts.length) % donuts.length);
@@ -110,7 +100,6 @@ export function DonutSlider() {
   };
 
   const onFav = async () => {
-    if (!current) return;
     const fav = isFavorite(current.id);
     await toggleFavorite(current.id);
     toast({
@@ -120,174 +109,184 @@ export function DonutSlider() {
   };
 
   const onAdd = async () => {
-    if (!current) return;
     try {
       await addToCart(current.id, qty);
-      toast({
-        title: "Added to cart!",
-        description: `${current.name} × ${qty}`,
-      });
+      toast({ title: "Added to cart!", description: `${current.name} × ${qty}` });
     } catch {
       toast({ title: "Couldn't add to cart", variant: "destructive" });
     }
   };
 
-  if (!current) return null;
-
   const fav = isFavorite(current.id);
-  const bg = TYPE_BG[current.type] ?? TYPE_BG.classic;
+  const tint = TYPE_TINT[current.type] ?? TYPE_TINT.classic;
   const accent = TYPE_ACCENT[current.type] ?? TYPE_ACCENT.classic;
+
+  // Build the 3 visible slots: prev, center, next.
+  const slots = [-1, 0, 1].map((off) => {
+    const idx = (index + off + donuts.length) % donuts.length;
+    return { offset: off, donut: donuts[idx] };
+  });
 
   return (
     <section
-      className="relative mx-auto w-full max-w-md flex-1 px-4 py-4"
+      className="relative mx-auto flex w-full max-w-md flex-1 flex-col px-4 py-4"
       aria-label="Donut slider"
     >
-      {/* Slider card with color-coded background */}
-      <div className="relative overflow-hidden rounded-3xl shadow-lg">
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.div
-            key={current.id}
-            custom={direction}
-            initial={{ opacity: 0, x: direction > 0 ? 120 : direction < 0 ? -120 : 0, scale: 0.9 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: direction > 0 ? -120 : 120, scale: 0.9 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.2}
-            onDragStart={() => setDragging(true)}
-            onDragEnd={onDragEnd}
-            className={cn(
-              "relative flex min-h-[480px] flex-col bg-gradient-to-br p-6",
-              bg,
-              dragging ? "cursor-grabbing" : "cursor-grab"
-            )}
-          >
-            {/* Favorite */}
-            <button
-              onClick={onFav}
-              aria-label={fav ? "Remove favorite" : "Add favorite"}
-              className={cn(
-                "absolute right-4 top-4 z-10 inline-flex size-10 items-center justify-center rounded-full shadow-md transition-colors",
-                fav ? "bg-[var(--color-dowgnut-pink)] text-white" : "bg-white/80 text-[var(--color-dowgnut-pink)]"
-              )}
-            >
-              <Heart className={cn("size-5", fav && "fill-current")} />
-            </button>
+      {/* 3-donut display area — center big, sides small/blur */}
+      <div
+        className="relative flex h-[340px] items-center justify-center overflow-hidden rounded-3xl"
+        style={{ backgroundColor: tint }}
+      >
+        {/* Drag layer */}
+        <motion.div
+          className="absolute inset-0 z-20 cursor-grab active:cursor-grabbing"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.15}
+          onDragStart={() => setDragging(true)}
+          onDragEnd={onDragEnd}
+        />
 
-            {/* Donut image — large, centered */}
-            <div className="flex flex-1 items-center justify-center py-6">
+        {/* 3 donut images */}
+        {slots.map(({ offset, donut }) => {
+          if (!donut) return null;
+          const isCenter = offset === 0;
+          return (
+            <motion.div
+              key={`${donut.id}-${offset}`}
+              initial={false}
+              animate={{
+                x: offset * 130,
+                scale: isCenter ? 1 : 0.6,
+                opacity: isCenter ? 1 : 0.5,
+                filter: isCenter ? "blur(0px)" : "blur(2px)",
+                zIndex: isCenter ? 10 : 5 - Math.abs(offset),
+              }}
+              transition={{ type: "spring", stiffness: 320, damping: 32 }}
+              className="absolute flex items-center justify-center"
+              style={{ pointerEvents: dragging ? "none" : "auto" }}
+            >
               <motion.img
-                src={current.imgUrl}
-                alt={current.name}
-                className="size-56 object-contain drop-shadow-2xl sm:size-64"
+                src={donut.imgUrl}
+                alt={donut.name}
+                className={cn(
+                  "object-contain drop-shadow-xl",
+                  isCenter ? "size-56" : "size-32"
+                )}
                 draggable={false}
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                animate={isCenter ? { y: [0, -8, 0] } : {}}
+                transition={isCenter ? { duration: 3, repeat: Infinity, ease: "easeInOut" } : {}}
               />
-            </div>
+            </motion.div>
+          );
+        })}
 
-            {/* Rating + type badge */}
-            <div className="mb-2 flex items-center gap-2">
-              <span
-                className="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"
-                style={{ backgroundColor: accent }}
-              >
-                {current.type}
-              </span>
-              {current.featured && (
-                <span className="inline-flex items-center gap-0.5 rounded-full bg-[var(--color-dowgnut-pink)] px-2 py-0.5 text-[10px] font-bold uppercase text-white">
-                  <Star className="size-2.5 fill-current" /> Hot
-                </span>
-              )}
-              <span className="ml-auto inline-flex items-center gap-0.5 text-sm font-bold" style={{ color: accent }}>
-                <Star className="size-3.5 fill-current" />
-                {current.rating.toFixed(1)}
-              </span>
-            </div>
-
-            {/* Bold flavor name (Video 1 concept) */}
-            <h2
-              className="graffiti-text text-3xl leading-none sm:text-4xl"
-              style={{ color: accent }}
-            >
-              {current.name}
-            </h2>
-
-            {/* Nutrition info (Video 2 concept) */}
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              <div className="rounded-xl bg-white/60 p-2 text-center">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--color-dowgnut-blue-dark)]/50">Energy</p>
-                <p className="text-sm font-black" style={{ color: accent }}>{current.calories}</p>
-                <p className="text-[9px] text-[var(--color-dowgnut-blue-dark)]/40">kcal</p>
-              </div>
-              <div className="rounded-xl bg-white/60 p-2 text-center">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--color-dowgnut-blue-dark)]/50">Sugar</p>
-                <p className="text-sm font-black" style={{ color: accent }}>{current.sugar}g</p>
-                <p className="text-[9px] text-[var(--color-dowgnut-blue-dark)]/40">per serving</p>
-              </div>
-              <div className="rounded-xl bg-white/60 p-2 text-center">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--color-dowgnut-blue-dark)]/50">Fat</p>
-                <p className="text-sm font-black" style={{ color: accent }}>{current.fat}g</p>
-                <p className="text-[9px] text-[var(--color-dowgnut-blue-dark)]/40">per serving</p>
-              </div>
-            </div>
-
-            {/* Price + qty + add to cart */}
-            <div className="mt-4 flex items-center gap-3">
-              <span className="text-2xl font-black" style={{ color: accent }}>
-                RM{(current.price * qty).toFixed(2)}
-              </span>
-              <div className="ml-auto inline-flex items-center gap-1 rounded-full bg-white/80 p-1">
-                <button
-                  onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  className="inline-flex size-8 items-center justify-center rounded-full text-[var(--color-dowgnut-blue-dark)]"
-                  aria-label="Decrease quantity"
-                >
-                  <Minus className="size-4" />
-                </button>
-                <span className="min-w-6 text-center text-sm font-bold">{qty}</span>
-                <button
-                  onClick={() => setQty((q) => q + 1)}
-                  className="inline-flex size-8 items-center justify-center rounded-full text-[var(--color-dowgnut-blue-dark)]"
-                  aria-label="Increase quantity"
-                >
-                  <Plus className="size-4" />
-                </button>
-              </div>
-            </div>
-
-            <button
-              onClick={onAdd}
-              disabled={current.stock <= 0}
-              className="mt-3 inline-flex h-12 w-full items-center justify-center gap-2 rounded-full text-sm font-bold text-white shadow-md transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-50"
-              style={{ backgroundColor: accent }}
-            >
-              <Plus className="size-4" /> Add to Cart
-            </button>
-
-            <button
-              onClick={() => openDetail(current)}
-              className="mt-2 text-center text-xs font-semibold uppercase tracking-wide text-[var(--color-dowgnut-blue-dark)]/50 hover:text-[var(--color-dowgnut-blue-dark)]"
-            >
-              View full details →
-            </button>
-          </motion.div>
-        </AnimatePresence>
+        {/* Favorite — on center donut */}
+        <button
+          onClick={onFav}
+          aria-label={fav ? "Remove favorite" : "Add favorite"}
+          className={cn(
+            "absolute right-4 top-4 z-30 inline-flex size-10 items-center justify-center rounded-full transition-all active:scale-90",
+            fav
+              ? "bg-[var(--color-dowgnut-pink)] text-white"
+              : "bg-white/80 text-[var(--color-dowgnut-pink)]"
+          )}
+        >
+          <Heart className={cn("size-5", fav && "fill-current")} />
+        </button>
       </div>
 
-      {/* Navigation arrows */}
-      <div className="mt-3 flex items-center justify-between">
+      {/* Info section — for center donut */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={current.id}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.2 }}
+          className="mt-4 flex flex-col gap-3"
+        >
+          {/* Type + rating */}
+          <div className="flex items-center gap-2">
+            <span
+              className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"
+              style={{ backgroundColor: accent }}
+            >
+              {current.type}
+            </span>
+            <span className="text-xs font-semibold text-[var(--color-dowgnut-blue-dark)]/70">
+              ★ {current.rating.toFixed(1)}
+            </span>
+            {current.featured && (
+              <span className="rounded-full bg-[var(--color-dowgnut-pink)] px-2 py-0.5 text-[10px] font-bold uppercase text-white">
+                Hot
+              </span>
+            )}
+          </div>
+
+          {/* Name */}
+          <h2 className="graffiti-text text-2xl leading-tight" style={{ color: accent }}>
+            {current.name}
+          </h2>
+
+          {/* Nutrition — inline */}
+          <div className="flex items-center gap-4 text-xs text-[var(--color-dowgnut-blue-dark)]/60">
+            <span><strong className="text-[var(--color-dowgnut-blue-dark)]">{current.calories}</strong> kcal</span>
+            <span><strong className="text-[var(--color-dowgnut-blue-dark)]">{current.sugar}g</strong> sugar</span>
+            <span><strong className="text-[var(--color-dowgnut-blue-dark)]">{current.fat}g</strong> fat</span>
+          </div>
+
+          {/* Price + qty */}
+          <div className="mt-1 flex items-center gap-3">
+            <span className="text-2xl font-black text-[var(--color-dowgnut-blue-dark)]">
+              RM{(current.price * qty).toFixed(2)}
+            </span>
+            <div className="ml-auto inline-flex items-center rounded-full border border-[var(--color-dowgnut-blue-dark)]/15">
+              <button
+                onClick={() => setQty((q) => Math.max(1, q - 1))}
+                className="inline-flex size-10 items-center justify-center rounded-l-full text-[var(--color-dowgnut-blue-dark)] hover:bg-[var(--color-dowgnut-cream)]"
+                aria-label="Decrease quantity"
+              >
+                <Minus className="size-4" />
+              </button>
+              <span className="min-w-8 text-center text-sm font-bold text-[var(--color-dowgnut-blue-dark)]">{qty}</span>
+              <button
+                onClick={() => setQty((q) => q + 1)}
+                className="inline-flex size-10 items-center justify-center rounded-r-full text-[var(--color-dowgnut-blue-dark)] hover:bg-[var(--color-dowgnut-cream)]"
+                aria-label="Increase quantity"
+              >
+                <Plus className="size-4" />
+              </button>
+            </div>
+          </div>
+
+          <button
+            onClick={onAdd}
+            disabled={current.stock <= 0}
+            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--color-dowgnut-pink)] text-sm font-bold text-white shadow-md transition-all hover:bg-[var(--color-dowgnut-pink-dark)] active:scale-95 disabled:opacity-50"
+          >
+            Add to Cart
+          </button>
+
+          <button
+            onClick={() => openDetail(current)}
+            className="flex items-center justify-center gap-1 py-1 text-xs font-semibold uppercase tracking-wider text-[var(--color-dowgnut-blue-dark)]/50 hover:text-[var(--color-dowgnut-blue-dark)]"
+          >
+            <Info className="size-3.5" /> Full details
+          </button>
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Navigation: arrows + dots */}
+      <div className="mt-4 flex items-center justify-between">
         <button
           onClick={() => go(-1)}
-          className="inline-flex size-10 items-center justify-center rounded-full bg-white shadow-sm text-[var(--color-dowgnut-blue-dark)] transition-transform hover:scale-105 active:scale-95"
+          className="inline-flex size-11 items-center justify-center rounded-full bg-white text-[var(--color-dowgnut-blue-dark)] transition-transform hover:scale-105 active:scale-95"
           aria-label="Previous donut"
         >
           <ChevronLeft className="size-5" />
         </button>
 
-        {/* Dots */}
         <div className="flex items-center gap-1.5">
           {donuts.map((_, i) => (
             <button
@@ -299,7 +298,7 @@ export function DonutSlider() {
               aria-label={`Go to donut ${i + 1}`}
               className={cn(
                 "h-2 rounded-full transition-all",
-                i === index ? "w-6 bg-[var(--color-dowgnut-pink)]" : "w-2 bg-[var(--color-dowgnut-blue-dark)]/20"
+                i === index ? "w-7 bg-[var(--color-dowgnut-pink)]" : "w-2 bg-[var(--color-dowgnut-blue-dark)]/20"
               )}
             />
           ))}
@@ -307,7 +306,7 @@ export function DonutSlider() {
 
         <button
           onClick={() => go(1)}
-          className="inline-flex size-10 items-center justify-center rounded-full bg-white shadow-sm text-[var(--color-dowgnut-blue-dark)] transition-transform hover:scale-105 active:scale-95"
+          className="inline-flex size-11 items-center justify-center rounded-full bg-white text-[var(--color-dowgnut-blue-dark)] transition-transform hover:scale-105 active:scale-95"
           aria-label="Next donut"
         >
           <ChevronRight className="size-5" />
