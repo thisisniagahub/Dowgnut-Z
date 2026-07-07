@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Heart, Package, ShoppingCart } from "lucide-react";
+import { Home, Heart, Package, ShoppingCart, SlidersHorizontal } from "lucide-react";
 import { useShop } from "@/store/use-shop";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +19,7 @@ export function BottomNav() {
 
   const items = [
     { key: "shop", label: "Shop", icon: Home },
+    { key: "slider", label: "Browse", icon: SlidersHorizontal },
     { key: "favorites", label: "Saved", icon: Heart, badge: favorites.length },
     { key: "cart", label: "Cart", icon: ShoppingCart, badge: cartCount, action: () => setCartOpen(true) },
     { key: "orders", label: "Orders", icon: Package },

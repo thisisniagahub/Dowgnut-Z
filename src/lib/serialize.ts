@@ -46,6 +46,8 @@ export function serializeDonut(row: DonutRow): Donut {
     tags: parseTags(row.tags),
     rating: row.rating,
     calories: row.calories,
+    sugar: (row as any).sugar ?? 10,
+    fat: (row as any).fat ?? 8,
     stock: row.stock,
     featured: row.featured,
   };

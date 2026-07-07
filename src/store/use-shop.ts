@@ -14,6 +14,7 @@ import { apiFetch, getSessionId, SESSION_KEY } from "@/lib/api";
 
 export type ShopView =
   | "shop"
+  | "slider"
   | "swipe"
   | "favorites"
   | "checkout"

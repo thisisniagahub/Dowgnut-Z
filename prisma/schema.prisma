@@ -21,6 +21,8 @@ model Donut {
   tags        String   @default("") // comma-separated e.g. "chocolate,glazed"
   rating      Float    @default(4.5)
   calories    Int      @default(250)
+  sugar       Int      @default(10) // grams
+  fat         Int      @default(8)  // grams
   stock       Int      @default(50)
   featured    Boolean  @default(false)
   createdAt   DateTime @default(now())

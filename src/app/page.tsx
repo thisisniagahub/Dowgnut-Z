@@ -7,6 +7,7 @@ import { DowgnutHeader } from "@/components/dowgnut/dowgnut-header";
 import { BottomNav } from "@/components/dowgnut/bottom-nav";
 import { DowgnutFooter } from "@/components/dowgnut/dowgnut-footer";
 import { SwipeView } from "@/components/dowgnut/swipe-view";
+import { DonutSlider } from "@/components/dowgnut/donut-slider";
 import { FavoritesView } from "@/components/dowgnut/favorites-view";
 import { CheckoutView } from "@/components/dowgnut/checkout-view";
 import { OrdersView } from "@/components/dowgnut/orders-view";
@@ -32,6 +33,7 @@ export default function Home() {
       <DowgnutHeader />
       <main className="flex flex-1 flex-col pb-16">
         {view === "shop" && <ShopHome />}
+        {view === "slider" && <DonutSlider />}
         {view === "swipe" && <SwipeView />}
         {view === "favorites" && <FavoritesView />}
         {view === "checkout" && <CheckoutView />}

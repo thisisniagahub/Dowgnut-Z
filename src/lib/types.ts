@@ -12,6 +12,8 @@ export interface Donut {
   tags: string[];
   rating: number;
   calories: number;
+  sugar: number;
+  fat: number;
   stock: number;
   featured: boolean;
 }
