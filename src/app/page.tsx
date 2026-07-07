@@ -31,7 +31,7 @@ export default function Home() {
     <>
       <SplashScreen />
       <DowgnutHeader />
-      <main className="flex flex-1 flex-col overflow-hidden pb-16">
+      <main className="flex flex-1 flex-col pb-16">
         {view === "shop" && <ShopHome />}
         {view === "slider" && <DonutSlider />}
         {view === "swipe" && <SwipeView />}
