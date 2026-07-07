@@ -4,6 +4,7 @@ import { Search, X, Truck, ShieldCheck, Clock, Flame } from "lucide-react";
 import { useShop } from "@/store/use-shop";
 import { Input } from "@/components/ui/input";
 import { DonutGrid } from "./donut-grid";
+import { DonutCarousel3D } from "./donut-carousel-3d";
 import { cn } from "@/lib/utils";
 
 const CATEGORIES = [
@@ -84,6 +85,9 @@ export function ShopHome() {
           );
         })}
       </div>
+
+      {/* 3D roulette donut carousel */}
+      <DonutCarousel3D />
 
       {/* Product grid */}
       <DonutGrid />

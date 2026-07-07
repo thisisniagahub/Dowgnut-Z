@@ -5,6 +5,7 @@ import { useShop } from "@/store/use-shop";
 import { SplashScreen } from "@/components/dowgnut/splash-screen";
 import { DowgnutHeader } from "@/components/dowgnut/dowgnut-header";
 import { BottomNav } from "@/components/dowgnut/bottom-nav";
+import { DowgnutFooter } from "@/components/dowgnut/dowgnut-footer";
 import { SwipeView } from "@/components/dowgnut/swipe-view";
 import { FavoritesView } from "@/components/dowgnut/favorites-view";
 import { CheckoutView } from "@/components/dowgnut/checkout-view";
@@ -38,6 +39,7 @@ export default function Home() {
         {view === "tracking" && <OrderTrackingView />}
         {view === "admin" && <AdminDashboard />}
       </main>
+      <DowgnutFooter />
       <BottomNav />
 
       {/* Overlays */}
