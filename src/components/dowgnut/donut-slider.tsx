@@ -273,7 +273,7 @@ export function DonutSlider() {
           <h2 className="text-sm font-bold leading-tight text-[var(--color-dowgnut-blue-dark)]">
             {current.name} <span className="font-normal text-[var(--color-dowgnut-blue-dark)]/40">★{current.rating.toFixed(1)}</span>
           </h2>
-          <p className="text-[9px] text-[var(--color-dowgnut-blue-dark)]/40">
+          <p className="text-xs text-[var(--color-dowgnut-blue-dark)]/50">
             {current.calories} kcal · {current.sugar}g · {current.fat}g
           </p>
           <div className="flex items-center gap-2">
@@ -315,7 +315,7 @@ export function DonutSlider() {
           >
             Add to Cart
           </button>
-          <p className="text-[8px] uppercase tracking-wider text-[var(--color-dowgnut-blue-dark)]/30">
+          <p className="text-xs uppercase tracking-wider text-[var(--color-dowgnut-blue-dark)]/40">
             {filterType && filterType !== "all" ? `${filterType} · ` : ""}{center + 1}/{len} · swipe
           </p>
         </motion.div>
