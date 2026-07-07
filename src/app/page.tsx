@@ -43,8 +43,9 @@ export default function Home() {
       </main>
 
       {/* No footer, no bottom nav on shop view — clean minimal first screen */}
-      {view !== "shop" && <DowgnutFooter />}
-      {view !== "shop" && <BottomNav />}
+      {/* Only show footer/nav on non-shop, non-slider views */}
+      {view !== "shop" && view !== "slider" && <DowgnutFooter />}
+      {view !== "shop" && view !== "slider" && <BottomNav />}
 
       {/* Overlays */}
       <DetailModal />
