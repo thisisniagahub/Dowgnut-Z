@@ -5,13 +5,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useShop } from "@/store/use-shop";
 
 /**
- * SplashScreen — cinematic brand moment.
- * Letter-by-letter "DOWGNUT" reveal + glow pulse + sprinkle particles.
+ * SplashScreen — cinematic brand moment with original wordmark logo.
+ * Logo fade-in + glow pulse + sprinkle particles.
  */
 
-const LETTERS = ["D", "O", "W", "G", "N", "U", "T"];
-
-// Pre-computed sprinkle particles.
 const SPRINKLES = Array.from({ length: 20 }).map((_, i) => ({
   x: (Math.random() - 0.5) * 300,
   y: (Math.random() - 0.5) * 400,
@@ -84,44 +81,23 @@ export function SplashScreen() {
             />
           ))}
 
-          {/* Logo icon */}
+          {/* Original DowgNut wordmark logo */}
           <motion.img
-            src="/brand/hypebeast-icon.png"
+            src="/brand/dowgnut-logo-wordmark.png"
             alt="DowgNut"
-            className="size-20 rounded-full object-cover sm:size-24"
+            className="h-20 w-auto drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)] sm:h-28"
             draggable={false}
             initial={{ scale: 0.5, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 200, damping: 15 }}
           />
 
-          {/* Letter-by-letter DOWGNUT reveal */}
-          <div className="mt-4 flex overflow-hidden">
-            {LETTERS.map((letter, i) => (
-              <motion.span
-                key={i}
-                initial={{ y: 40, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{
-                  delay: 0.4 + i * 0.08,
-                  type: "spring",
-                  stiffness: 200,
-                  damping: 12,
-                }}
-                className="graffiti-text text-4xl text-white sm:text-5xl"
-                style={{ textShadow: "0 0 20px rgba(232,248,102,0.5)" }}
-              >
-                {letter}
-              </motion.span>
-            ))}
-          </div>
-
           {/* Tagline */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 0.5 }}
-            className="mt-2 text-xs font-medium tracking-[0.3em] text-[var(--color-dowgnut-lime)]"
+            transition={{ delay: 0.8, duration: 0.5 }}
+            className="mt-4 text-xs font-medium tracking-[0.3em] text-[var(--color-dowgnut-lime)]"
           >
             FRESH · BOLD · DELIVERED
           </motion.p>

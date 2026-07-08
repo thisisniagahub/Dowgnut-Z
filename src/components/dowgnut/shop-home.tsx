@@ -5,13 +5,12 @@ import { ChevronRight } from "lucide-react";
 import { useShop } from "@/store/use-shop";
 import { useGamification } from "@/store/use-gamification";
 import { ParticleBackground } from "./particle-background";
-import { cn } from "@/lib/utils";
 import type { Donut } from "@/lib/types";
 
-const TYPES: { key: string; label: string; desc: string; bg: string; accent: string }[] = [
-  { key: "classic", label: "Classic", desc: "Timeless glazed & cake", bg: "from-[#FFF7ED] to-[#FFE4C4]", accent: "#92400E" },
-  { key: "sprinkled", label: "Sprinkled", desc: "Rainbow jimmies & fun", bg: "from-[#FDF2F8] to-[#FBCFE8]", accent: "#BE185D" },
-  { key: "stuffed", label: "Stuffed", desc: "Filled with cream & jelly", bg: "from-[#EFF6FF] to-[#BFDBFE]", accent: "#1E40AF" },
+const TYPES: { key: string; label: string; desc: string; accent: string }[] = [
+  { key: "classic", label: "Classic", desc: "Timeless glazed & cake", accent: "#92400E" },
+  { key: "sprinkled", label: "Sprinkled", desc: "Rainbow jimmies & fun", accent: "#BE185D" },
+  { key: "stuffed", label: "Stuffed", desc: "Filled with cream & jelly", accent: "#1E40AF" },
 ];
 
 export function ShopHome() {
@@ -36,22 +35,22 @@ export function ShopHome() {
   };
 
   return (
-    <div className="relative flex flex-1 flex-col px-4 pt-4 sm:px-6">
+    <div className="relative flex flex-1 flex-col items-center px-4 pt-4 sm:px-6">
       {/* Floating sprinkle particles */}
-      <ParticleBackground count={30} />
+      <ParticleBackground count={25} />
 
       {/* Hero heading */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="relative mb-4 text-center"
+        className="relative mb-6 text-center"
       >
         <h1 className="graffiti-text text-2xl text-[var(--color-dowgnut-blue-dark)] sm:text-3xl">
-          Pick your style
+          Choose Ur Flava
         </h1>
         <p className="mt-1 text-xs text-[var(--color-dowgnut-blue-dark)]/50">
-          Tap a donut type to browse flavors
+          Tap a donut to browse flavors
         </p>
         {streak > 0 && (
           <motion.div
@@ -66,8 +65,8 @@ export function ShopHome() {
         )}
       </motion.div>
 
-      {/* 3 type cards */}
-      <div className="relative flex flex-col gap-3">
+      {/* 3 donut types — frameless, big donuts */}
+      <div className="relative flex w-full max-w-sm flex-1 flex-col justify-center gap-2">
         {TYPES.map((t, i) => {
           const preview = typePreview[t.key];
           return (
@@ -82,29 +81,21 @@ export function ShopHome() {
               transition={{ delay: 0.15 + i * 0.1, type: "spring", stiffness: 200, damping: 20 }}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className={cn(
-                "group relative flex items-center gap-4 overflow-hidden bg-gradient-to-br p-4 backdrop-blur-sm",
-                "glass-card border border-white/30",
-                t.bg
-              )}
+              className="group relative flex flex-1 items-center justify-center"
             >
               {preview && (
                 <motion.img
                   src={preview.imgUrl}
                   alt={t.label}
-                  className="size-20 shrink-0 object-contain"
+                  className="size-28 object-contain sm:size-32"
                   draggable={false}
                   animate={{ y: [0, -6, 0] }}
                   transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }}
                 />
               )}
-              <div className="flex-1 text-left">
-                <p className="text-lg font-black" style={{ color: t.accent }}>{t.label}</p>
-                <p className="text-xs font-medium text-[var(--color-dowgnut-blue-dark)]/60">{t.desc}</p>
+              <div className="absolute bottom-0 text-center">
+                <p className="text-sm font-black" style={{ color: t.accent }}>{t.label}</p>
               </div>
-              <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity }}>
-                <ChevronRight className="size-5" style={{ color: t.accent }} />
-              </motion.div>
             </motion.button>
           );
         })}
@@ -118,7 +109,7 @@ export function ShopHome() {
           transition={{ delay: 0.6 }}
           className="relative mt-4 flex flex-wrap justify-center gap-2"
         >
-          {earnedBadges.map((b: any) => (
+          {earnedBadges.map((b) => (
             <span key={b.id} className="inline-flex items-center gap-1 rounded-full bg-white/60 px-2 py-1 text-xs font-bold text-[var(--color-dowgnut-blue-dark)] backdrop-blur-sm">
               {b.emoji} {b.label}
             </span>
@@ -128,4 +119,3 @@ export function ShopHome() {
     </div>
   );
 }
-
