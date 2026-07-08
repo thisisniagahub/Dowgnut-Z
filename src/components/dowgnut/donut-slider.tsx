@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   motion,
   AnimatePresence,
@@ -22,7 +22,7 @@ import type { Donut } from "@/lib/types";
  * Center donut = active, with nutrition + qty + add to cart below.
  */
 
-const PX_PER_DONUT = 120; // lower = more sensitive drag
+const PX_PER_DONUT = 250; // higher = less sensitive, smoother drag
 const TILT = 56;
 const RADIUS = 150;
 
@@ -118,6 +118,10 @@ export function DonutSlider() {
   const [dragging, setDragging] = useState(false);
   const [prevCenter, setPrevCenter] = useState(0);
 
+  // Capture starting position at drag start — prevents feedback loop
+  // where live-updating `center` state causes position to jump.
+  const dragStartPos = useRef(0);
+
   // Reset position + center when the filtered donut list changes (different
   // type selected from home). Prevents "missing donuts" or wrong center.
   const [prevLen, setPrevLen] = useState(len);
@@ -160,8 +164,15 @@ export function DonutSlider() {
     snapTo(Math.round(position.get()) + dir);
   };
 
+  const onPanStart = () => {
+    // Capture starting position — this is the ONLY reference during drag.
+    // Do NOT use `center` state (it updates live via useMotionValueEvent,
+    // which would cause a feedback loop and make drag feel crazy fast).
+    dragStartPos.current = position.get();
+    setDragging(true);
+  };
   const onPan = (_: unknown, info: PanInfo) => {
-    position.set(center - info.offset.x / PX_PER_DONUT);
+    position.set(dragStartPos.current - info.offset.x / PX_PER_DONUT);
   };
   const onPanEnd = () => {
     snapTo(Math.round(position.get()));
@@ -235,7 +246,7 @@ export function DonutSlider() {
       >
         <motion.div
           className="absolute inset-0 z-40 cursor-grab touch-pan-y active:cursor-grabbing"
-          onPanStart={() => setDragging(true)}
+          onPanStart={onPanStart}
           onPan={onPan}
           onPanEnd={onPanEnd}
         />
