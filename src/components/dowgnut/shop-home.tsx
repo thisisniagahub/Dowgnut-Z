@@ -87,10 +87,10 @@ export function ShopHome() {
                 <motion.img
                   src={preview.imgUrl}
                   alt={t.label}
-                  className="size-28 object-contain sm:size-32"
+                  className="size-48 object-contain sm:size-56"
                   draggable={false}
-                  animate={{ y: [0, -6, 0] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }}
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                 />
               )}
               <div className="absolute bottom-0 text-center">
