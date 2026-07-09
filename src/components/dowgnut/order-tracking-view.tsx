@@ -397,11 +397,11 @@ export function OrderTrackingView() {
                     {item.name}
                   </span>
                   <span className="text-xs text-[var(--color-dowgnut-blue-dark)]/60">
-                    {item.quantity} × ${item.price.toFixed(2)}
+                    {item.quantity} × RM{item.price.toFixed(2)}
                   </span>
                 </div>
                 <span className="text-sm font-bold text-[var(--color-dowgnut-blue-dark)]">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  RM{(item.price * item.quantity).toFixed(2)}
                 </span>
               </li>
             ))}

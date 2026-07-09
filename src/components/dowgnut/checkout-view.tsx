@@ -64,6 +64,7 @@ export function CheckoutView() {
   const [form, setForm] = useState({
     customerName: "",
     customerEmail: "",
+    phone: "",
     address: "",
     city: "",
     zip: "",
@@ -71,18 +72,25 @@ export function CheckoutView() {
   });
   const [payment, setPayment] = useState<PaymentMethod>("tng");
   const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<string[]>([]);
 
   const subtotal = cart.reduce((sum, c) => sum + c.donut.price * c.quantity, 0);
   const delivery = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FLAT;
   const total = subtotal + delivery;
 
-  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm((f) => ({ ...f, [k]: e.target.value }));
+    if (errors.length > 0) {
+      const fieldName = k === "customerName" ? "name" : k === "customerEmail" ? "email" : k;
+      setErrors((prev) => prev.filter((err) => err !== fieldName));
+    }
+  };
 
   const validate = () => {
     const missing: string[] = [];
     if (!form.customerName.trim()) missing.push("name");
     if (!form.customerEmail.trim()) missing.push("email");
+    if (!form.phone.trim()) missing.push("phone");
     if (!form.address.trim()) missing.push("address");
     if (!form.city.trim()) missing.push("city");
     if (!form.zip.trim()) missing.push("zip");
@@ -91,10 +99,11 @@ export function CheckoutView() {
 
   const onPlace = async () => {
     const missing = validate();
+    setErrors(missing);
     if (missing.length > 0) {
       toast({
         title: "Mind the gaps",
-        description: `Missing: RM{missing.join(", ")}`,
+        description: `Please fill in all required fields: ${missing.join(", ")}`,
         variant: "destructive",
       });
       return;
@@ -155,7 +164,7 @@ export function CheckoutView() {
           <button
             onClick={() => setView("shop")}
             aria-label="Back to shop"
-            className="inline-flex size-11 items-center justify-center rounded-full bg-white text-[var(--color-dowgnut-blue)] shadow-sm hover:bg-[var(--color-dowgnut-blue)] hover:text-white"
+            className="inline-flex size-11 items-center justify-center rounded-full bg-white text-[var(--color-dowgnut-blue)] shadow-sm hover:bg-[var(--color-dowgnut-blue)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-dowgnut-pink)] focus-visible:ring-offset-2"
           >
             <ArrowLeft className="size-5" />
           </button>
@@ -180,24 +189,28 @@ export function CheckoutView() {
             </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="name">Name *</Label>
-                <Input id="name" value={form.customerName} onChange={set("customerName")} placeholder="Jane Doe" className="h-11 bg-white" />
+                <Label htmlFor="name" className={cn(errors.includes("name") && "text-destructive")}>Name *</Label>
+                <Input id="name" autoComplete="name" value={form.customerName} onChange={set("customerName")} placeholder="Jane Doe" className={cn("h-11 bg-white", errors.includes("name") && "border-destructive ring-destructive focus-visible:ring-destructive")} />
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="email">Email *</Label>
-                <Input id="email" type="email" value={form.customerEmail} onChange={set("customerEmail")} placeholder="jane@dowgnut.com" className="h-11 bg-white" />
+                <Label htmlFor="email" className={cn(errors.includes("email") && "text-destructive")}>Email *</Label>
+                <Input id="email" type="email" autoComplete="email" value={form.customerEmail} onChange={set("customerEmail")} placeholder="jane@dowgnut.com" className={cn("h-11 bg-white", errors.includes("email") && "border-destructive ring-destructive focus-visible:ring-destructive")} />
               </div>
               <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <Label htmlFor="address">Address *</Label>
-                <Input id="address" value={form.address} onChange={set("address")} placeholder="123 Jalan Sugar" className="h-11 bg-white" />
+                <Label htmlFor="phone" className={cn(errors.includes("phone") && "text-destructive")}>Phone *</Label>
+                <Input id="phone" type="tel" autoComplete="tel" value={form.phone} onChange={set("phone")} placeholder="+60 12-345 6789" className={cn("h-11 bg-white", errors.includes("phone") && "border-destructive ring-destructive focus-visible:ring-destructive")} />
+              </div>
+              <div className="flex flex-col gap-1.5 sm:col-span-2">
+                <Label htmlFor="address" className={cn(errors.includes("address") && "text-destructive")}>Address *</Label>
+                <Input id="address" autoComplete="street-address" value={form.address} onChange={set("address")} placeholder="123 Jalan Sugar" className={cn("h-11 bg-white", errors.includes("address") && "border-destructive ring-destructive focus-visible:ring-destructive")} />
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="city">City *</Label>
-                <Input id="city" value={form.city} onChange={set("city")} placeholder="Kuala Lumpur" className="h-11 bg-white" />
+                <Label htmlFor="city" className={cn(errors.includes("city") && "text-destructive")}>City *</Label>
+                <Input id="city" autoComplete="address-level2" value={form.city} onChange={set("city")} placeholder="Kuala Lumpur" className={cn("h-11 bg-white", errors.includes("city") && "border-destructive ring-destructive focus-visible:ring-destructive")} />
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="zip">Postcode *</Label>
-                <Input id="zip" value={form.zip} onChange={set("zip")} placeholder="50000" className="h-11 bg-white" />
+                <Label htmlFor="zip" className={cn(errors.includes("zip") && "text-destructive")}>Postcode *</Label>
+                <Input id="zip" autoComplete="postal-code" value={form.zip} onChange={set("zip")} placeholder="50000" className={cn("h-11 bg-white", errors.includes("zip") && "border-destructive ring-destructive focus-visible:ring-destructive")} />
               </div>
               <div className="flex flex-col gap-1.5 sm:col-span-2">
                 <Label htmlFor="notes">Notes (optional)</Label>
@@ -225,7 +238,8 @@ export function CheckoutView() {
                       "relative flex flex-col items-start gap-2 rounded-2xl border-2 p-4 text-left transition-all",
                       selected
                         ? "border-[var(--color-dowgnut-pink)] bg-white shadow-md"
-                        : "border-[var(--color-dowgnut-blue-dark)]/10 bg-white/60 hover:border-[var(--color-dowgnut-blue-dark)]/30"
+                        : "border-[var(--color-dowgnut-blue-dark)]/10 bg-white/60 hover:border-[var(--color-dowgnut-blue-dark)]/30",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-dowgnut-pink)] focus-visible:ring-offset-2"
                     )}
                   >
                     {selected && (
@@ -258,27 +272,27 @@ export function CheckoutView() {
           <ul className="flex flex-col gap-2">
             {cart.map((item) => (
               <li key={item.id} className="flex items-center gap-3 rounded-2xl bg-[var(--color-dowgnut-cream)]/70 p-2">
-                <img src={item.donut.imgUrl} alt={item.donut.name} className="size-12 object-contain" />
+                <img src={item.donut.imgUrl} alt={item.donut.name} width={48} height={48} className="size-12 object-contain" />
                 <div className="flex min-w-0 flex-1 flex-col">
                   <span className="line-clamp-1 text-sm font-bold text-[var(--color-dowgnut-blue-dark)]">{item.donut.name}</span>
-                  <span className="text-xs text-[var(--color-dowgnut-blue-dark)]/60">{item.quantity} × RM{item.donut.price.toFixed(2)}</span>
+                  <span className="text-xs tabular-nums text-[var(--color-dowgnut-blue-dark)]/60">{item.quantity} × RM{item.donut.price.toFixed(2)}</span>
                 </div>
-                <span className="text-sm font-bold text-[var(--color-dowgnut-blue-dark)]">RM{(item.donut.price * item.quantity).toFixed(2)}</span>
+                <span className="text-sm font-bold tabular-nums text-[var(--color-dowgnut-blue-dark)]">RM{(item.donut.price * item.quantity).toFixed(2)}</span>
               </li>
             ))}
           </ul>
           <div className="mt-2 space-y-1 border-t border-[var(--color-dowgnut-blue-dark)]/10 pt-3 text-sm">
             <div className="flex justify-between text-[var(--color-dowgnut-blue-dark)]/80">
               <span>Subtotal</span>
-              <span className="font-semibold">RM{subtotal.toFixed(2)}</span>
+              <span className="font-semibold tabular-nums">RM{subtotal.toFixed(2)}</span>
             </div>
             <div className="flex items-center justify-between text-[var(--color-dowgnut-blue-dark)]/80">
               <span className="inline-flex items-center gap-1"><Truck className="size-4" /> Delivery</span>
-              <span className="font-semibold">{delivery === 0 ? "FREE" : `RMRM{delivery.toFixed(2)}`}</span>
+              <span className="font-semibold tabular-nums">{delivery === 0 ? "FREE" : `RM${delivery.toFixed(2)}`}</span>
             </div>
             <div className="mt-2 flex justify-between border-t border-[var(--color-dowgnut-blue-dark)]/10 pt-2 text-base font-bold text-[var(--color-dowgnut-blue-dark)]">
               <span>Total</span>
-              <span>RM{total.toFixed(2)}</span>
+              <span className="tabular-nums">RM{total.toFixed(2)}</span>
             </div>
           </div>
           <Button

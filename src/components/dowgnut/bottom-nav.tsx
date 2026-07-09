@@ -14,17 +14,25 @@ export function BottomNav() {
 
   const cartCount = cart.reduce((n, c) => n + c.quantity, 0);
 
-  const items = [
+  interface NavItem {
+    key: string;
+    label: string;
+    icon: any;
+    badge?: number;
+    action?: () => void;
+  }
+
+  const items: NavItem[] = [
     { key: "shop", label: "Shop", icon: Home },
     { key: "slider", label: "Browse", icon: SlidersHorizontal },
     { key: "favorites", label: "Saved", icon: Heart, badge: favorites.length },
     { key: "cart", label: "Cart", icon: ShoppingCart, badge: cartCount, action: () => setCartOpen(true) },
     { key: "orders", label: "Orders", icon: Package },
-  ] as const;
+  ];
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/20 bg-[var(--color-dowgnut-cream)]/80 backdrop-blur-xl pb-[env(safe-area-inset-bottom)]"
+      className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/20 bg-white/60 backdrop-blur-2xl pb-[env(safe-area-inset-bottom)]"
       aria-label="Bottom navigation"
     >
       <div className="mx-auto flex h-16 max-w-md items-center justify-around px-2">
@@ -40,6 +48,7 @@ export function BottomNav() {
               transition={{ type: "spring", stiffness: 400, damping: 17 }}
               className={cn(
                 "relative flex flex-1 flex-col items-center gap-0.5 py-1.5 transition-colors",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-dowgnut-pink)] rounded-xl",
                 isActive ? "text-[var(--color-dowgnut-pink-dark)]" : "text-[var(--color-dowgnut-blue-dark)]/50"
               )}
               aria-label={item.label}
@@ -50,10 +59,13 @@ export function BottomNav() {
                 <motion.div
                   layoutId="navIndicator"
                   className="absolute -top-0.5 h-1 w-8 rounded-full bg-[var(--color-dowgnut-pink)]"
+                  style={{ boxShadow: "0 0 12px var(--color-dowgnut-pink), 0 0 4px var(--color-dowgnut-pink)" }}
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 />
               )}
-              <Icon className={cn("size-5", isActive && "stroke-[2.5]")} />
+              <motion.div animate={{ y: isActive ? -2 : 0 }} transition={{ type: "spring", stiffness: 400, damping: 20 }}>
+                <Icon className={cn("size-5", isActive && "stroke-[2.5]")} />
+              </motion.div>
               <span className={cn("text-[10px] font-semibold", isActive && "font-bold")}>
                 {item.label}
               </span>

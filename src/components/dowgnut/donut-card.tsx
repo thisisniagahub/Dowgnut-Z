@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import { Heart, Plus, Star } from "lucide-react";
 import { useShop } from "@/store/use-shop";
 import { useToast } from "@/hooks/use-toast";
@@ -25,6 +25,16 @@ export function DonutCard({ donut }: DonutCardProps) {
   const mouseY = useMotionValue(0);
   const rotateX = useTransform(mouseY, [-0.5, 0.5], ["8deg", "-8deg"]);
   const rotateY = useTransform(mouseX, [-0.5, 0.5], ["-8deg", "8deg"]);
+
+  // Dynamic 3D shadow — moves opposite to tilt
+  const shadowX = useTransform(mouseX, [-0.5, 0.5], [8, -8]);
+  const shadowY = useTransform(mouseY, [-0.5, 0.5], [8, -8]);
+  const smoothShadowX = useSpring(shadowX, { stiffness: 200, damping: 20 });
+  const smoothShadowY = useSpring(shadowY, { stiffness: 200, damping: 20 });
+  const dynamicShadow = useTransform(
+    [smoothShadowX, smoothShadowY],
+    ([x, y]: number[]) => `${x}px ${y}px 20px rgba(7, 51, 79, 0.12), 0 2px 8px rgba(0,0,0,0.06)`
+  );
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -82,8 +92,8 @@ export function DonutCard({ donut }: DonutCardProps) {
       }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      style={{ rotateX, rotateY, transformPerspective: 600 }}
-      className="group relative flex cursor-pointer flex-col rounded-2xl border border-[var(--color-dowgnut-blue-dark)]/8 bg-[var(--color-dowgnut-cream)]/70 backdrop-blur-sm p-2 transition-shadow hover:shadow-lg"
+      style={{ rotateX, rotateY, transformPerspective: 600, boxShadow: dynamicShadow }}
+      className="group relative flex cursor-pointer flex-col rounded-2xl border border-[var(--color-dowgnut-blue-dark)]/8 bg-[var(--color-dowgnut-cream)]/70 backdrop-blur-sm p-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-dowgnut-pink)] focus-visible:ring-offset-2"
     >
       <button
         onClick={onFav}
@@ -97,11 +107,17 @@ export function DonutCard({ donut }: DonutCardProps) {
       </button>
 
       <div className="relative flex aspect-square items-center justify-center p-2">
-        <img
+        {/* Radial glow behind donut on hover */}
+        <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_center,var(--color-dowgnut-pink)/12_0%,transparent_70%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+        <motion.img
           src={donut.imgUrl}
           alt={donut.name}
-          className="size-full object-contain transition-transform duration-500 group-hover:scale-110"
+          width={160}
+          height={160}
+          className="relative size-full object-contain"
           loading="lazy"
+          whileHover={{ scale: 1.12, translateZ: 20 }}
+          transition={{ type: "spring", stiffness: 260, damping: 18 }}
         />
         {donut.featured && (
           <span className="absolute bottom-1 left-1 rounded-full bg-[var(--color-dowgnut-pink)] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
@@ -121,7 +137,7 @@ export function DonutCard({ donut }: DonutCardProps) {
           <span className="text-[var(--color-dowgnut-blue-dark)]/50">{donut.calories}cal</span>
         </div>
         <div className="mt-1 flex items-baseline gap-1">
-          <span className="text-base font-black text-[var(--color-dowgnut-pink-dark)]">RM{donut.price.toFixed(2)}</span>
+          <span className="text-base font-black tabular-nums text-[var(--color-dowgnut-pink-dark)]">RM{donut.price.toFixed(2)}</span>
         </div>
         {donut.stock <= 5 && donut.stock > 0 && (
           <p className="text-[11px] font-bold uppercase tracking-wide text-[var(--color-dowgnut-pink-dark)]">
@@ -132,9 +148,11 @@ export function DonutCard({ donut }: DonutCardProps) {
           onClick={onAdd}
           disabled={donut.stock <= 0}
           aria-label={`Add ${donut.name} to cart`}
-          className="mt-1.5 inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-full bg-[var(--color-dowgnut-pink)] text-xs font-bold text-white transition-all hover:bg-[var(--color-dowgnut-pink-dark)] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+          className="group/btn relative mt-1.5 inline-flex h-8 w-full items-center justify-center gap-1.5 overflow-hidden rounded-full bg-[var(--color-dowgnut-pink)] text-xs font-bold text-white transition-all hover:bg-[var(--color-dowgnut-pink-dark)] hover:shadow-[0_0_16px_var(--color-dowgnut-pink)] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-dowgnut-pink)] focus-visible:ring-offset-2"
         >
-          <Plus className="size-3.5" /> Add
+          {/* Shimmer sweep */}
+          <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover/btn:translate-x-full" />
+          <Plus className="relative size-3.5" /> <span className="relative">Add</span>
         </button>
       </div>
     </motion.div>

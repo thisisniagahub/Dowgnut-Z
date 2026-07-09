@@ -114,12 +114,6 @@ export function DowgnutFooter() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-4 text-xs text-white/60 sm:flex-row sm:px-6">
           <p>© 2025 DowgNut — Good Vibes &amp; Good Dowg</p>
           <div className="flex items-center gap-4">
-            <button
-              onClick={() => setView("admin")}
-              className="text-white/30 transition-colors hover:text-white/60"
-            >
-              Admin
-            </button>
             <p className="italic">Built with AI 🍩</p>
           </div>
         </div>

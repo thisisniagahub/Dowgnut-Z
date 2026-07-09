@@ -1,16 +1,17 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { useShop } from "@/store/use-shop";
 import { useGamification } from "@/store/use-gamification";
 import { ParticleBackground } from "./particle-background";
 import type { Donut } from "@/lib/types";
 
-const TYPES: { key: string; label: string; desc: string; accent: string }[] = [
-  { key: "classic", label: "Classic", desc: "Timeless glazed & cake", accent: "#92400E" },
-  { key: "sprinkled", label: "Sprinkled", desc: "Rainbow jimmies & fun", accent: "#BE185D" },
-  { key: "stuffed", label: "Stuffed", desc: "Filled with cream & jelly", accent: "#1E40AF" },
+const TYPES: { key: string; label: string; desc: string; accentClass: string }[] = [
+  { key: "classic", label: "Classic", desc: "Timeless glazed & cake", accentClass: "text-[#92400E]" },
+  { key: "sprinkled", label: "Sprinkled", desc: "Rainbow jimmies & fun", accentClass: "text-[#BE185D]" },
+  { key: "stuffed", label: "Stuffed", desc: "Filled with cream & jelly", accentClass: "text-[#1E40AF]" },
+  { key: "specialty", label: "Specialty", desc: "Premium & exotic flavors", accentClass: "text-[#7C3AED]" },
 ];
 
 export function ShopHome() {
@@ -28,14 +29,35 @@ export function ShopHome() {
     { id: "try-all", label: "Donut Master", emoji: "👑", earned: orderedDonutNames.length >= 21 },
   ].filter((b) => b.earned);
 
+  const { scrollY } = useScroll();
+  const yParallaxLeft = useTransform(scrollY, [0, 500], [0, -100]);
+  const yParallaxRight = useTransform(scrollY, [0, 500], [0, -180]);
+  const rotateParallax = useTransform(scrollY, [0, 500], [0, 90]);
+
   const typePreview: Record<string, Donut | undefined> = {
     classic: donuts.find((d) => d.type === "classic"),
     sprinkled: donuts.find((d) => d.type === "sprinkled"),
     stuffed: donuts.find((d) => d.type === "stuffed"),
+    specialty: donuts.find((d) => d.type === "specialty"),
   };
 
   return (
-    <div className="relative flex flex-1 flex-col items-center px-4 pt-4 sm:px-6">
+    <div className="relative flex flex-1 flex-col items-center px-4 pt-4 sm:px-6 overflow-hidden">
+      {/* Scroll Parallax background elements */}
+      <motion.div
+        style={{ y: yParallaxLeft, rotate: rotateParallax }}
+        className="absolute left-[-60px] top-[15%] size-36 opacity-10 blur-[1px] pointer-events-none md:left-[-20px] select-none"
+      >
+        <img src="https://romanejaquez.github.io/flutter-codelab4/assets/donutclassic/donut_classic1.png" alt="" width={144} height={144} loading="lazy" className="size-full object-contain" />
+      </motion.div>
+
+      <motion.div
+        style={{ y: yParallaxRight, rotate: rotateParallax }}
+        className="absolute right-[-65px] top-[45%] size-40 opacity-10 blur-[2px] pointer-events-none md:right-[-30px] select-none"
+      >
+        <img src="https://romanejaquez.github.io/flutter-codelab4/assets/donutsprinkled/donut_sprinkled1.png" alt="" width={160} height={160} loading="lazy" className="size-full object-contain" />
+      </motion.div>
+
       {/* Floating sprinkle particles */}
       <ParticleBackground count={25} />
 
@@ -46,7 +68,7 @@ export function ShopHome() {
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className="relative mb-6 text-center"
       >
-        <h1 className="graffiti-text text-2xl text-[var(--color-dowgnut-blue-dark)] sm:text-3xl">
+        <h1 className="graffiti-text text-2xl sm:text-3xl bg-gradient-to-r from-[var(--color-dowgnut-pink)] via-[var(--color-dowgnut-blue)] to-[var(--color-dowgnut-lime)] bg-[200%_auto] bg-clip-text text-transparent animate-[gradient-shift_4s_ease_infinite]">
           Choose Ur Flava
         </h1>
         <p className="mt-1 text-xs text-[var(--color-dowgnut-blue-dark)]/50">
@@ -55,7 +77,8 @@ export function ShopHome() {
         {streak > 0 && (
           <motion.div
             initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
             className="mt-2 inline-flex items-center gap-1 rounded-full bg-[var(--color-dowgnut-pink)]/10 px-3 py-1"
           >
             <span className="text-xs font-bold text-[var(--color-dowgnut-pink-dark)]">
@@ -76,12 +99,13 @@ export function ShopHome() {
                 setFilterType(t.key);
                 setView("slider");
               }}
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.15 + i * 0.1, type: "spring", stiffness: 200, damping: 20 }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="group relative flex flex-1 items-center justify-center"
+              initial={{ opacity: 0, x: -40, rotateY: -15 }}
+              whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ delay: 0.1 + i * 0.12, type: "spring", stiffness: 200, damping: 20 }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+              className="group relative flex flex-1 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-dowgnut-pink)] rounded-2xl"
             >
               {preview && (
                 <motion.img
@@ -94,7 +118,7 @@ export function ShopHome() {
                 />
               )}
               <div className="absolute bottom-0 text-center">
-                <p className="text-sm font-black" style={{ color: t.accent }}>{t.label}</p>
+                <p className={`text-sm font-black ${t.accentClass}`}>{t.label}</p>
               </div>
             </motion.button>
           );
@@ -104,15 +128,26 @@ export function ShopHome() {
       {/* Badges row */}
       {earnedBadges.length > 0 && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.5 }}
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.08 } },
+          }}
           className="relative mt-4 flex flex-wrap justify-center gap-2"
         >
           {earnedBadges.map((b) => (
-            <span key={b.id} className="inline-flex items-center gap-1 rounded-full bg-white/60 px-2 py-1 text-xs font-bold text-[var(--color-dowgnut-blue-dark)] backdrop-blur-sm">
+            <motion.span
+              key={b.id}
+              variants={{
+                hidden: { opacity: 0, y: 16, scale: 0.8 },
+                visible: { opacity: 1, y: 0, scale: 1, transition: { type: "spring", stiffness: 260, damping: 20 } },
+              }}
+              className="inline-flex items-center gap-1 rounded-full bg-white/60 px-2 py-1 text-xs font-bold text-[var(--color-dowgnut-blue-dark)] backdrop-blur-sm"
+            >
               {b.emoji} {b.label}
-            </span>
+            </motion.span>
           ))}
         </motion.div>
       )}

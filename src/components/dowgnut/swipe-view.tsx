@@ -168,7 +168,7 @@ const SwipeCard = forwardRef<SwipeCardHandle, SwipeCardProps>(
                 {donut.name}
               </h3>
               <span className="shrink-0 rounded-full bg-[var(--color-dowgnut-blue)] px-3 py-1 text-lg font-black text-white">
-                ${donut.price.toFixed(2)}
+                RM{donut.price.toFixed(2)}
               </span>
             </div>
 

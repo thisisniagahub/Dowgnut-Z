@@ -116,33 +116,47 @@ function flyDonutToCart(imgUrl: string, fromEl?: HTMLElement | null) {
   const fromRect = fromEl.getBoundingClientRect();
   const toRect = cartIcon.getBoundingClientRect();
 
-  const flyEl = document.createElement("img");
-  flyEl.src = imgUrl;
-  flyEl.style.cssText = `
+  const startX = fromRect.left + fromRect.width / 2 - 30;
+  const startY = fromRect.top + fromRect.height / 2 - 30;
+  const endX = toRect.left + toRect.width / 2 - 15;
+  const endY = toRect.top + toRect.height / 2 - 15;
+
+  // Outer container controls horizontal ease-out (X-axis)
+  const outer = document.createElement("div");
+  outer.style.cssText = `
     position: fixed;
-    left: ${fromRect.left + fromRect.width / 2 - 30}px;
-    top: ${fromRect.top + fromRect.height / 2 - 30}px;
+    left: 0;
+    top: 0;
+    z-index: 9999;
+    pointer-events: none;
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+    transform: translate3d(${startX}px, ${startY}px, 0);
+  `;
+
+  // Inner image controls vertical parabolic launch/fall (Y-axis) and 3D effects (scale/spin)
+  const inner = document.createElement("img");
+  inner.src = imgUrl;
+  inner.style.cssText = `
     width: 60px;
     height: 60px;
     object-fit: contain;
-    z-index: 9999;
-    pointer-events: none;
-    transition: all 0.7s cubic-bezier(0.4, 0, 0.6, 1);
+    transition: transform 0.8s cubic-bezier(0.06, -0.6, 0.8, 0.4), opacity 0.8s ease;
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
     opacity: 1;
   `;
-  document.body.appendChild(flyEl);
 
-  // Trigger animation to cart
+  outer.appendChild(inner);
+  document.body.appendChild(outer);
+
+  // Trigger physics-based parabolic launch
   requestAnimationFrame(() => {
-    flyEl.style.left = `${toRect.left + toRect.width / 2 - 15}px`;
-    flyEl.style.top = `${toRect.top + toRect.height / 2 - 15}px`;
-    flyEl.style.width = "30px";
-    flyEl.style.height = "30px";
-    flyEl.style.opacity = "0.3";
-    flyEl.style.transform = "rotate(180deg)";
+    outer.style.transform = `translate3d(${endX}px, ${startY}px, 0)`;
+    const deltaY = endY - startY;
+    inner.style.transform = `translate3d(0, ${deltaY}px, 0) scale(0.4) rotate(360deg)`;
+    inner.style.opacity = "0.2";
   });
 
-  setTimeout(() => flyEl.remove(), 750);
+  setTimeout(() => outer.remove(), 850);
 }
 
 // Cart badge bounce

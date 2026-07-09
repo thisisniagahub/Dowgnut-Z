@@ -10,7 +10,7 @@ import { parseTags } from "@/lib/serialize";
  * builds the config from environment variables. Locally, falls back to the
  * SDK's file-based ZAI.create() which reads /etc/.z-ai-config or ~/.z-ai-config.
  */
-export async function getZai(): Promise<InstanceType<typeof ZAI>> {
+export async function getZai(): Promise<any> {
   const envConfig = {
     baseUrl: process.env.ZAI_BASE_URL,
     apiKey: process.env.ZAI_API_KEY,
@@ -20,7 +20,7 @@ export async function getZai(): Promise<InstanceType<typeof ZAI>> {
   };
   if (envConfig.baseUrl && envConfig.apiKey) {
     // Use env-var config (Vercel production)
-    return new ZAI(envConfig as any);
+    return new (ZAI as any)(envConfig);
   }
   // Local dev — read from .z-ai-config file
   return ZAI.create();

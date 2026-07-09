@@ -8,8 +8,20 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -48,7 +60,7 @@ export function CartDrawer() {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetContent
         side="right"
-        className="flex w-full flex-col gap-0 bg-[var(--color-dowgnut-cream)] p-0 sm:max-w-md"
+        className="flex w-full flex-col gap-0 bg-[var(--color-dowgnut-cream)]/80 backdrop-blur-2xl p-0 sm:max-w-md"
       >
         <SheetHeader className="border-b-4 border-[var(--color-dowgnut-pink)] bg-[var(--color-dowgnut-blue)] p-4 text-white">
           <SheetTitle className="graffiti-text flex items-center gap-2 text-2xl text-white">
@@ -61,7 +73,7 @@ export function CartDrawer() {
         </SheetHeader>
 
         {/* Items */}
-        <div className="flex-1 overflow-y-auto scrollbar-dowgnut p-4">
+        <ScrollArea className="flex-1 p-4">
           {loading && cart.length === 0 ? (
             <div className="flex items-center justify-center py-12 text-[var(--color-dowgnut-blue)]">
               <p className="text-sm">Loading your dowgs…</p>
@@ -96,7 +108,7 @@ export function CartDrawer() {
               {cart.map((item) => (
                 <li
                   key={item.id}
-                  className="flex gap-3 rounded-2xl border border-[var(--color-dowgnut-blue-dark)]/10 bg-white/80 p-3"
+                  className="flex gap-3 rounded-2xl border border-white/30 bg-white/50 backdrop-blur-md p-3 shadow-sm transition-shadow hover:shadow-md"
                 >
                   <img
                     src={item.donut.imgUrl}
@@ -110,13 +122,13 @@ export function CartDrawer() {
                       </p>
                       <button
                         onClick={() => removeFromCart(item.id)}
-                        aria-label={`Remove RM{item.donut.name}`}
+                        aria-label={`Remove ${item.donut.name}`}
                         className="text-[var(--color-dowgnut-blue-dark)]/40 hover:text-destructive"
                       >
                         <X className="size-4" />
                       </button>
                     </div>
-                    <p className="text-xs text-[var(--color-dowgnut-blue)]/70">
+                    <p className="text-xs tabular-nums text-[var(--color-dowgnut-blue)]/70">
                       RM{item.donut.price.toFixed(2)} each
                     </p>
                     <div className="mt-auto flex items-center justify-between pt-2">
@@ -126,7 +138,7 @@ export function CartDrawer() {
                             updateCartQty(item.id, item.quantity - 1)
                           }
                           aria-label="Decrease quantity"
-                          className="inline-flex size-8 items-center justify-center text-[var(--color-dowgnut-blue)] hover:text-[var(--color-dowgnut-pink)]"
+                          className="inline-flex size-8 items-center justify-center text-[var(--color-dowgnut-blue)] hover:text-[var(--color-dowgnut-pink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-dowgnut-pink)] rounded-full"
                         >
                           <Minus className="size-3.5" />
                         </button>
@@ -138,12 +150,12 @@ export function CartDrawer() {
                             updateCartQty(item.id, item.quantity + 1)
                           }
                           aria-label="Increase quantity"
-                          className="inline-flex size-8 items-center justify-center text-[var(--color-dowgnut-blue)] hover:text-[var(--color-dowgnut-pink)]"
+                          className="inline-flex size-8 items-center justify-center text-[var(--color-dowgnut-blue)] hover:text-[var(--color-dowgnut-pink)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-dowgnut-pink)] rounded-full"
                         >
                           <Plus className="size-3.5" />
                         </button>
                       </div>
-                      <span className="text-sm font-bold text-[var(--color-dowgnut-blue-dark)]">
+                      <span className="text-sm font-bold tabular-nums text-[var(--color-dowgnut-blue-dark)]">
                         RM{(item.donut.price * item.quantity).toFixed(2)}
                       </span>
                     </div>
@@ -152,11 +164,11 @@ export function CartDrawer() {
               ))}
             </ul>
           )}
-        </div>
+        </ScrollArea>
 
         {/* Footer */}
         {cart.length > 0 && (
-          <div className="border-t border-[var(--color-dowgnut-blue-dark)]/10 bg-[var(--color-dowgnut-cream)] p-4">
+          <div className="border-t border-white/30 bg-white/60 backdrop-blur-xl p-4">
             {/* Free delivery progress */}
             <div className="mb-3 rounded-2xl bg-white/70 p-3">
               <div className="flex items-center gap-2 text-xs">
@@ -180,17 +192,17 @@ export function CartDrawer() {
             <div className="space-y-1 text-sm">
               <div className="flex justify-between text-[var(--color-dowgnut-blue-dark)]/80">
                 <span>Subtotal</span>
-                <span className="font-semibold">RM{subtotal.toFixed(2)}</span>
+                <span className="font-semibold tabular-nums">RM{subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-[var(--color-dowgnut-blue-dark)]/80">
                 <span>Delivery</span>
                 <span className="font-semibold">
-                  {delivery === 0 ? "FREE" : `RMRM{delivery.toFixed(2)}`}
+                  {delivery === 0 ? "FREE" : `RM${delivery.toFixed(2)}`}
                 </span>
               </div>
               <div className="mt-2 flex justify-between border-t border-[var(--color-dowgnut-blue-dark)]/10 pt-2 text-base font-bold text-[var(--color-dowgnut-blue-dark)]">
                 <span>Total</span>
-                <span>RM{total.toFixed(2)}</span>
+                <span className="tabular-nums">RM{total.toFixed(2)}</span>
               </div>
             </div>
 
@@ -200,14 +212,34 @@ export function CartDrawer() {
             >
               Checkout • RM{total.toFixed(2)}
             </Button>
-            <button
-              onClick={onClear}
-              className={cn(
-                "mt-2 inline-flex w-full items-center justify-center gap-1.5 py-1 text-xs font-semibold uppercase tracking-wide text-[var(--color-dowgnut-blue-dark)]/50 hover:text-destructive"
-              )}
-            >
-              <Trash2 className="size-3.5" /> Clear cart
-            </button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button
+                  className={cn(
+                    "mt-2 inline-flex w-full items-center justify-center gap-1.5 py-1 text-xs font-semibold uppercase tracking-wide text-[var(--color-dowgnut-blue-dark)]/50 hover:text-destructive"
+                  )}
+                >
+                  <Trash2 className="size-3.5" /> Clear cart
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="rounded-3xl border-2 border-[var(--color-dowgnut-blue-dark)]/10">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="graffiti-text text-xl text-[var(--color-dowgnut-blue-dark)]">Clear all dowgs?</AlertDialogTitle>
+                  <AlertDialogDescription className="text-sm text-[var(--color-dowgnut-blue-dark)]/70">
+                    This will remove all {cart.length} item{cart.length === 1 ? "" : "s"} from your cart. You can always add them back.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="rounded-full">Keep shopping</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={onClear}
+                    className="rounded-full bg-destructive text-white hover:bg-destructive/90"
+                  >
+                    <Trash2 className="size-3.5" /> Yes, clear cart
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         )}
       </SheetContent>

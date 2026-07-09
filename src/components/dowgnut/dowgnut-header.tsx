@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, Menu, Sparkles } from "lucide-react";
 import { useShop } from "@/store/use-shop";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Sheet,
   SheetContent,
@@ -12,6 +13,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function DowgnutHeader() {
   const view = useShop((s) => s.view);
@@ -43,53 +49,104 @@ export function DowgnutHeader() {
     >
       <div className={`mx-auto flex items-center justify-between px-4 transition-all duration-300 ${scrolled ? "h-12" : "h-14"} sm:px-6`}>
         {/* Left: logo + brand name */}
-        <button
-          onClick={() => go("shop")}
-          className="flex shrink-0 items-center gap-2"
-          aria-label="DowgNut home"
-        >
-          <img
-            src="/brand/hypebeast-icon.png"
-            alt="DowgNut"
-            className="h-8 w-8 rounded-full object-cover"
-            draggable={false}
-          />
-          <span className="graffiti-text text-lg text-white">DOWGNUT</span>
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => go("shop")}
+            className="flex shrink-0 items-center gap-2"
+            aria-label="DowgNut home"
+          >
+            <img
+              src="/brand/hypebeast-icon.png"
+              alt="DowgNut"
+              width={32}
+              height={32}
+              className="h-8 w-8 rounded-full object-cover"
+              draggable={false}
+            />
+            <img
+              src="/brand/dowgnut-logo-wordmark.png"
+              alt="DowgNut"
+              width={120}
+              height={24}
+              className="h-5 w-auto object-contain brightness-0 invert sm:h-6"
+              draggable={false}
+            />
+          </button>
+
+          {/* Desktop nav links */}
+          <nav className="hidden items-center gap-1 sm:flex" aria-label="Main navigation">
+            {[
+              { k: "shop", l: "Shop" },
+              { k: "swipe", l: "Swipe" },
+              { k: "favorites", l: "Favorites" },
+              { k: "orders", l: "Orders" },
+            ].map((item) => {
+              const isActive = view === item.k;
+              return (
+                <button
+                  key={item.k}
+                  onClick={() => go(item.k as any)}
+                  className={cn(
+                    "rounded-full px-3 py-1.5 text-sm font-semibold transition-all",
+                    isActive
+                      ? "bg-white/20 text-white"
+                      : "text-white/70 hover:bg-white/10 hover:text-white"
+                  )}
+                >
+                  {item.l}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
 
         {/* Right: actions */}
         <div className="flex items-center gap-2">
-          <Button
-            onClick={() => setConciergeOpen(true)}
-            variant="ghost"
-            className="hidden size-9 rounded-full bg-white/10 p-0 text-white hover:bg-white/20 hover:text-white sm:inline-flex"
-            aria-label="AI Concierge"
-          >
-            <Sparkles className="size-4" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={() => setConciergeOpen(true)}
+                variant="ghost"
+                className="hidden size-9 rounded-full bg-white/10 p-0 text-white hover:bg-white/20 hover:text-white sm:inline-flex"
+                aria-label="AI Concierge"
+              >
+                <Sparkles className="size-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="border border-[var(--color-dowgnut-blue-dark)] bg-[var(--color-dowgnut-blue-dark)] text-white">
+              AI Concierge Chat
+            </TooltipContent>
+          </Tooltip>
 
           {/* Cart with animated badge */}
-          <button
-            onClick={() => setCartOpen(true)}
-            className="relative inline-flex size-9 items-center justify-center rounded-full bg-[var(--color-dowgnut-pink)] text-white shadow-sm transition-transform hover:scale-105 active:scale-95"
-            aria-label="Open cart"
-          >
-            <ShoppingCart className="size-4" />
-            <AnimatePresence>
-              {cartCount > 0 && (
-                <motion.span
-                  key={cartCount}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                  className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-dowgnut-lime)] px-1 text-[9px] font-bold text-[var(--color-dowgnut-blue-dark)] ring-2 ring-[var(--color-dowgnut-blue)]"
-                >
-                  {cartCount}
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => setCartOpen(true)}
+                className="relative inline-flex size-9 items-center justify-center rounded-full bg-[var(--color-dowgnut-pink)] text-white shadow-sm transition-transform hover:scale-105 active:scale-95"
+                aria-label="Open cart"
+              >
+                <ShoppingCart className="size-4" />
+                <AnimatePresence>
+                  {cartCount > 0 && (
+                    <motion.span
+                      key={cartCount}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 15 }}
+                      className="absolute -right-1 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--color-dowgnut-lime)] px-1 text-[9px] font-bold text-[var(--color-dowgnut-blue-dark)] ring-2 ring-[var(--color-dowgnut-blue)]"
+                    >
+                      {cartCount}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="border border-[var(--color-dowgnut-blue-dark)] bg-[var(--color-dowgnut-blue-dark)] text-white">
+              Your Cart
+            </TooltipContent>
+          </Tooltip>
 
           {/* Mobile menu */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>

@@ -9,6 +9,7 @@ import {
   useMotionValueEvent,
   animate,
   type PanInfo,
+  type MotionValue,
 } from "framer-motion";
 import { Plus } from "lucide-react";
 import { useShop } from "@/store/use-shop";
@@ -94,12 +95,12 @@ function DonutCard3D({
 }: {
   donut: Donut;
   index: number;
-  position: ReturnType<typeof useMotionValue>;
+  position: MotionValue<number>;
   len: number;
   onCenter: () => void;
 }) {
   // Wrapped offset of this donut from the front (shortest path around).
-  const wrapped = useTransform(position, (p) => wrapOffset(index - p, len));
+  const wrapped = useTransform(position, (p: number) => wrapOffset(index - p, len));
 
   const x = useTransform(wrapped, (o) => slot(o, len).x);
   const y = useTransform(wrapped, (o) => slot(o, len).y);

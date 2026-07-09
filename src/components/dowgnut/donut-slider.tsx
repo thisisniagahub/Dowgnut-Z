@@ -9,10 +9,13 @@ import {
   useMotionValueEvent,
   animate,
   type PanInfo,
+  type MotionValue,
 } from "framer-motion";
 import { Heart, Minus, Plus, ArrowLeft } from "lucide-react";
 import { useShop } from "@/store/use-shop";
 import { useToast } from "@/hooks/use-toast";
+import { celebrateAddToCart, celebrateFavorite } from "@/lib/celebrations";
+import { playAddToCart, playFavorite } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 import type { Donut } from "@/lib/types";
 
@@ -57,11 +60,11 @@ function RingCard({
 }: {
   donut: Donut;
   index: number;
-  position: ReturnType<typeof useMotionValue>;
+  position: MotionValue<number>;
   len: number;
   onCenter: () => void;
 }) {
-  const wrapped = useTransform(position, (p) => wrapOffset(index - p, len));
+  const wrapped = useTransform(position, (p: number) => wrapOffset(index - p, len));
   const x = useTransform(wrapped, (o) => slot(o, len).x);
   const y = useTransform(wrapped, (o) => slot(o, len).y);
   const scale = useTransform(wrapped, (o) => slot(o, len).scale);
@@ -210,19 +213,25 @@ export function DonutSlider() {
 
   const fav = isFavorite(current.id);
 
-  const onFav = async () => {
+  const onFav = async (e: React.MouseEvent) => {
     const wasFav = isFavorite(current.id);
     await toggleFavorite(current.id);
     toast({
       title: wasFav ? "Removed from favorites" : "Saved to favorites",
       description: current.name,
     });
+    if (!wasFav) {
+      celebrateFavorite(e.currentTarget as HTMLElement);
+      playFavorite();
+    }
   };
 
-  const onAdd = async () => {
+  const onAdd = async (e: React.MouseEvent) => {
     try {
       await addToCart(current.id, qty);
       toast({ title: "Added to cart!", description: `${current.name} × ${qty}` });
+      celebrateAddToCart(e.currentTarget as HTMLElement, current.imgUrl);
+      playAddToCart();
     } catch {
       toast({ title: "Couldn't add to cart", variant: "destructive" });
     }
