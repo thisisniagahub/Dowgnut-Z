@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Send, Sparkles, Loader2 } from "lucide-react";
 import { useShop } from "@/store/use-shop";
@@ -12,10 +12,13 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { ChatMessage, Donut } from "@/lib/types";
+import type { Donut } from "@/lib/types";
 
-interface Bubble extends ChatMessage {
+interface Bubble {
   id: string;
+  role: "user" | "assistant";
+  content: string;
+  donuts?: Donut[];
 }
 
 const SUGGESTIONS = [
@@ -28,14 +31,18 @@ const SUGGESTIONS = [
 export function AIConcierge() {
   const open = useShop((s) => s.conciergeOpen);
   const setOpen = useShop((s) => s.setConciergeOpen);
-  const aiConcierge = useShop((s) => s.aiConcierge);
+  const cart = useShop((s) => s.cart);
+  const favorites = useShop((s) => s.favorites);
+  const donuts = useShop((s) => s.donuts);
   const openDetail = useShop((s) => s.openDetail);
 
   const [messages, setMessages] = useState<Bubble[]>([]);
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const assistantMsgRef = useRef<string>("");
 
   useEffect(() => {
     if (open) {
@@ -52,8 +59,7 @@ export function AIConcierge() {
         {
           id: "intro",
           role: "assistant",
-          content:
-            "Hey! I'm the DowgNut Concierge 🍩 — tell me what you're craving and I'll match you with the perfect dowg.",
+          content: "Hey! I'm the DowgNut Concierge 🍩 — tell me what you're craving and I'll match you with the perfect dowg.",
         },
       ]);
     }
@@ -63,46 +69,151 @@ export function AIConcierge() {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, loading]);
+  }, [messages, isStreaming]);
+
+  const buildContext = useCallback(() => {
+    const ctx: {
+      cart?: { donutId: string; name: string; quantity: number }[];
+      favorites?: { donutId: string; name: string }[];
+      viewedDonuts?: { id: string; name: string; type: string }[];
+    } = {};
+    if (cart.length > 0) {
+      ctx.cart = cart.map((c) => ({
+        donutId: c.donut.id,
+        name: c.donut.name,
+        quantity: c.quantity,
+      }));
+    }
+    if (favorites.length > 0) {
+      ctx.favorites = favorites.map((f) => ({
+        donutId: f.donut.id,
+        name: f.donut.name,
+      }));
+    }
+    // Add recently viewed (last 5)
+    const viewed = donuts.slice(0, 5).map((d) => ({
+      id: d.id,
+      name: d.name,
+      type: d.type,
+    }));
+    if (viewed.length > 0) {
+      ctx.viewedDonuts = viewed;
+    }
+    return ctx;
+  }, [cart, favorites, donuts]);
 
   const send = async (text: string) => {
     const trimmed = text.trim();
-    if (!trimmed || loading) return;
+    if (!trimmed || isStreaming) return;
+
     const userMsg: Bubble = {
       id: `u-${Date.now()}`,
       role: "user",
       content: trimmed,
     };
-    const nextMessages = [...messages, userMsg];
-    setMessages(nextMessages);
+
+    setMessages((prev) => [...prev, userMsg]);
     setInput("");
-    setLoading(true);
+    setIsStreaming(true);
+    assistantMsgRef.current = "";
+
+    // Create placeholder assistant message
+    const assistantId = `a-${Date.now()}`;
+    setMessages((prev) => [
+      ...prev,
+      { id: assistantId, role: "assistant", content: "", donuts: [] },
+    ]);
+
+    // Abort any in-flight request
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
-      const res = await aiConcierge(
-        nextMessages
+      const context = buildContext();
+      const payload = {
+        messages: messages
           .filter((m) => m.id !== "intro")
           .map((m) => ({ role: m.role, content: m.content }))
-      );
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `a-${Date.now()}`,
-          role: "assistant",
-          content: res.reply || "Hmm, I'm stumped. Try another craving!",
-          donuts: res.donuts || [],
-        },
-      ]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `a-${Date.now()}`,
-          role: "assistant",
-          content: "Sorry, my donut radar is on the fritz. Try again in a sec.",
-        },
-      ]);
+          .concat({ role: "user", content: trimmed }),
+        context,
+        stream: true,
+      };
+
+      const res = await fetch("/api/ai/hermes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+
+      if (!res.ok || !res.body) {
+        const errText = await res.text().catch(() => "");
+        throw new Error(`Hermes request failed (${res.status}): ${errText || res.statusText}`);
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          const trimmedLine = line.trim();
+          if (!trimmedLine.startsWith("data:")) continue;
+
+          const data = trimmedLine.slice(5).trim();
+          if (data === "[DONE]") continue;
+
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.type === "token" && parsed.token) {
+              assistantMsgRef.current += parsed.token;
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantId ? { ...m, content: assistantMsgRef.current } : m
+                )
+              );
+            } else if (parsed.type === "done") {
+              // Optionally update with donuts if provided
+              if (parsed.donuts && parsed.donuts.length > 0) {
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === assistantId
+                      ? { ...m, content: parsed.reply || assistantMsgRef.current, donuts: parsed.donuts }
+                      : m
+                  )
+                );
+              }
+            } else if (parsed.type === "error") {
+              throw new Error(parsed.error || "Hermes error");
+            }
+          } catch {
+            // Ignore malformed chunks
+          }
+        }
+      }
+    } catch (err: any) {
+      if (err?.name === "AbortError") {
+        // Ignore
+      } else {
+        setMessages((prev) => [
+          ...prev.filter((m) => m.id !== assistantId),
+          {
+            id: `a-${Date.now()}`,
+            role: "assistant",
+            content: "Sorry, my donut radar is on the fritz. Try again in a sec.",
+          },
+        ]);
+      }
     } finally {
-      setLoading(false);
+      setIsStreaming(false);
     }
   };
 
@@ -199,7 +310,7 @@ export function AIConcierge() {
               </div>
             ))}
 
-            {loading && (
+            {isStreaming && (
               <div className="flex items-center gap-2 text-sm text-[var(--color-dowgnut-blue)]">
                 <Loader2 className="size-4 animate-spin" />
                 <span>Concierge is thinking…</span>
@@ -239,7 +350,7 @@ export function AIConcierge() {
             />
             <Button
               type="submit"
-              disabled={loading || !input.trim()}
+              disabled={isStreaming || !input.trim()}
               size="icon"
               className="size-11 rounded-full bg-[var(--color-dowgnut-pink)] text-white hover:bg-[var(--color-dowgnut-pink-dark)] hover:text-white"
               aria-label="Send"

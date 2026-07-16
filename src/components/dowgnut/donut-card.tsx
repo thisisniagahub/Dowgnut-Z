@@ -18,6 +18,7 @@ export function DonutCard({ donut }: DonutCardProps) {
   const isFavorite = useShop((s) => s.isFavorite);
   const toggleFavorite = useShop((s) => s.toggleFavorite);
   const addToCart = useShop((s) => s.addToCart);
+  const triggerTapau = useShop((s) => s.triggerTapau);
   const { toast } = useToast();
 
   // Mouse-track 3D tilt
@@ -70,6 +71,11 @@ export function DonutCard({ donut }: DonutCardProps) {
       toast({ title: "Added to cart!", description: `${donut.name} × 1` });
       celebrateAddToCart(e.currentTarget as HTMLElement, donut.imgUrl);
       playAddToCart();
+
+      // Trigger tapau physics animation
+      if (triggerTapau) {
+        await triggerTapau(donut);
+      }
     } catch {
       toast({ title: "Couldn't add to cart", variant: "destructive" });
     }

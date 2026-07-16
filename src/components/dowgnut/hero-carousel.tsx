@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useShop } from "@/store/use-shop";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
+import { MamakAmbient } from "./MamakAmbient";
 
 interface Slide {
   image: string;
@@ -66,19 +67,23 @@ export function HeroCarousel() {
       <div className="relative aspect-[16/10] w-full overflow-hidden rounded-3xl border-4 border-[var(--color-dowgnut-blue-dark)] bg-[var(--color-dowgnut-cream)] shadow-[0_8px_0_rgba(7,51,79,0.18)] sm:aspect-[21/9]">
         <AnimatePresence mode="wait">
           <motion.div
-            key={index}
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.6, ease: "easeInOut" }}
-            className="absolute inset-0"
-          >
-            <img
-              src={slides[index].image}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-dowgnut-blue-dark)]/85 via-[var(--color-dowgnut-blue-dark)]/40 to-transparent" />
+                      key={index}
+                      initial={{ opacity: 0, scale: 1.04 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.6, ease: "easeInOut" }}
+                      className="absolute inset-0"
+                    >
+                      <img
+                        src={slides[index].image}
+                        alt=""
+                        className="absolute inset-0 h-full w-full object-cover"
+                      />
+                      <MamakAmbient 
+                        isActive={true} 
+                        className="absolute inset-0 pointer-events-none"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-dowgnut-blue-dark)]/85 via-[var(--color-dowgnut-blue-dark)]/40 to-transparent" />
             <div className="relative flex h-full flex-col justify-center gap-3 p-6 sm:p-10 lg:p-14">
               <span className="inline-flex w-fit items-center rounded-full bg-[var(--color-dowgnut-lime)] px-3 py-1 text-xs font-bold uppercase tracking-widest text-[var(--color-dowgnut-blue-dark)]">
                 {slides[index].eyebrow}

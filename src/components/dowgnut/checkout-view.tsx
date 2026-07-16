@@ -6,6 +6,7 @@ import { useShop } from "@/store/use-shop";
 import { useGamification } from "@/store/use-gamification";
 import { celebrateOrderComplete } from "@/lib/celebrations";
 import { playOrderComplete } from "@/lib/sounds";
+import { DuitNowQRBurst } from "./DuitNowQRBurst";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,7 +18,7 @@ import { cn } from "@/lib/utils";
 const FREE_DELIVERY_THRESHOLD = 25;
 const DELIVERY_FLAT = 3.99;
 
-type PaymentMethod = "tng" | "duitnow" | "card";
+type PaymentMethod = "tng" | "duitnow" | "card" | "senangpay";
 
 const PAYMENTS: {
   id: PaymentMethod;
@@ -27,6 +28,14 @@ const PAYMENTS: {
   badgeBg: string;
   badgeColor: string;
 }[] = [
+  {
+    id: "senangpay",
+    name: "SenangPay",
+    desc: "FPX, Cards, eWallets",
+    badge: "SP",
+    badgeBg: "bg-[#FF6B35]",
+    badgeColor: "text-white",
+  },
   {
     id: "tng",
     name: "Touch 'n Go",
@@ -70,7 +79,7 @@ export function CheckoutView() {
     zip: "",
     notes: "",
   });
-  const [payment, setPayment] = useState<PaymentMethod>("tng");
+  const [payment, setPayment] = useState<PaymentMethod>("senangpay");
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
 
@@ -109,14 +118,15 @@ export function CheckoutView() {
       return;
     }
     setSubmitting(true);
-    // Simulate payment processing for the selected Malaysia gateway.
-    await new Promise((r) => setTimeout(r, 1400));
     try {
+      // First create the order
       const order = await checkout(form);
+      
       toast({
-        title: "Payment successful! 🍩",
-        description: `Order ${order.id.slice(0, 8)} paid via ${PAYMENTS.find((p) => p.id === payment)?.name}.`,
+        title: "Order created! 🍩",
+        description: `Order ${order.id.slice(0, 8)} created. Redirecting to payment...`,
       });
+
       // Celebrate + gamification
       celebrateOrderComplete();
       playOrderComplete();
@@ -124,6 +134,46 @@ export function CheckoutView() {
       const types = cart.map((c) => c.donut.type);
       recordOrder(donutNames, types);
       startTracking(order.id, form.customerName);
+
+      // Redirect to payment gateway
+      if (payment === "senangpay") {
+        const res = await fetch("/api/checkout/create-payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: order.id,
+            customerName: form.customerName,
+            customerEmail: form.customerEmail,
+            customerPhone: form.phone,
+            amount: total,
+            items: order.items,
+            returnUrl: `${window.location.origin}/order/${order.id}`,
+          }),
+        });
+
+        const data = await res.json();
+        
+        if (data.paymentFormHtml) {
+          // Render the payment form in an iframe or new window
+          const paymentWindow = window.open("", "_blank");
+          if (paymentWindow) {
+            paymentWindow.document.write(data.paymentFormHtml);
+            paymentWindow.document.close();
+          } else {
+            // Fallback: create a form and submit
+            const div = document.createElement("div");
+            div.innerHTML = data.paymentFormHtml;
+            const formEl = div.querySelector("form");
+            if (formEl) {
+              document.body.appendChild(formEl);
+              formEl.submit();
+            }
+          }
+        }
+      } else if (payment === "duitnow") {
+        // For DuitNow, show QR burst
+        setView("duitnow-qr");
+      }
     } catch (err: any) {
       toast({
         title: "Couldn't place order",
@@ -189,32 +239,94 @@ export function CheckoutView() {
             </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="name" className={cn(errors.includes("name") && "text-destructive")}>Name *</Label>
-                <Input id="name" autoComplete="name" value={form.customerName} onChange={set("customerName")} placeholder="Jane Doe" className={cn("h-11 bg-white", errors.includes("name") && "border-destructive ring-destructive focus-visible:ring-destructive")} />
+                <Label htmlFor="name" className={cn(errors.includes("name") && "text-destructive")}>
+                  Name *
+                </Label>
+                <Input
+                  id="name"
+                  autoComplete="name"
+                  value={form.customerName}
+                  onChange={set("customerName")}
+                  placeholder="Jane Doe"
+                  className={cn("h-11 bg-white", errors.includes("name") && "border-destructive ring-destructive focus-visible:ring-destructive")}
+                />
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="email" className={cn(errors.includes("email") && "text-destructive")}>Email *</Label>
-                <Input id="email" type="email" autoComplete="email" value={form.customerEmail} onChange={set("customerEmail")} placeholder="jane@dowgnut.com" className={cn("h-11 bg-white", errors.includes("email") && "border-destructive ring-destructive focus-visible:ring-destructive")} />
+                <Label htmlFor="email" className={cn(errors.includes("email") && "text-destructive")}>
+                  Email *
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  value={form.customerEmail}
+                  onChange={set("customerEmail")}
+                  placeholder="jane@dowgnut.com"
+                  className={cn("h-11 bg-white", errors.includes("email") && "border-destructive ring-destructive focus-visible:ring-destructive")}
+                />
               </div>
               <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <Label htmlFor="phone" className={cn(errors.includes("phone") && "text-destructive")}>Phone *</Label>
-                <Input id="phone" type="tel" autoComplete="tel" value={form.phone} onChange={set("phone")} placeholder="+60 12-345 6789" className={cn("h-11 bg-white", errors.includes("phone") && "border-destructive ring-destructive focus-visible:ring-destructive")} />
+                <Label htmlFor="phone" className={cn(errors.includes("phone") && "text-destructive")}>
+                  Phone *
+                </Label>
+                <Input
+                  id="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  value={form.phone}
+                  onChange={set("phone")}
+                  placeholder="+60 12-345 6789"
+                  className={cn("h-11 bg-white", errors.includes("phone") && "border-destructive ring-destructive focus-visible:ring-destructive")}
+                />
               </div>
               <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <Label htmlFor="address" className={cn(errors.includes("address") && "text-destructive")}>Address *</Label>
-                <Input id="address" autoComplete="street-address" value={form.address} onChange={set("address")} placeholder="123 Jalan Sugar" className={cn("h-11 bg-white", errors.includes("address") && "border-destructive ring-destructive focus-visible:ring-destructive")} />
+                <Label htmlFor="address" className={cn(errors.includes("address") && "text-destructive")}>
+                  Address *
+                </Label>
+                <Input
+                  id="address"
+                  autoComplete="street-address"
+                  value={form.address}
+                  onChange={set("address")}
+                  placeholder="123 Jalan Sugar"
+                  className={cn("h-11 bg-white", errors.includes("address") && "border-destructive ring-destructive focus-visible:ring-destructive")}
+                />
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="city" className={cn(errors.includes("city") && "text-destructive")}>City *</Label>
-                <Input id="city" autoComplete="address-level2" value={form.city} onChange={set("city")} placeholder="Kuala Lumpur" className={cn("h-11 bg-white", errors.includes("city") && "border-destructive ring-destructive focus-visible:ring-destructive")} />
+                <Label htmlFor="city" className={cn(errors.includes("city") && "text-destructive")}>
+                  City *
+                </Label>
+                <Input
+                  id="city"
+                  autoComplete="address-level2"
+                  value={form.city}
+                  onChange={set("city")}
+                  placeholder="Kuala Lumpur"
+                  className={cn("h-11 bg-white", errors.includes("city") && "border-destructive ring-destructive focus-visible:ring-destructive")}
+                />
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="zip" className={cn(errors.includes("zip") && "text-destructive")}>Postcode *</Label>
-                <Input id="zip" autoComplete="postal-code" value={form.zip} onChange={set("zip")} placeholder="50000" className={cn("h-11 bg-white", errors.includes("zip") && "border-destructive ring-destructive focus-visible:ring-destructive")} />
+                <Label htmlFor="zip" className={cn(errors.includes("zip") && "text-destructive")}>
+                  Postcode *
+                </Label>
+                <Input
+                  id="zip"
+                  autoComplete="postal-code"
+                  value={form.zip}
+                  onChange={set("zip")}
+                  placeholder="50000"
+                  className={cn("h-11 bg-white", errors.includes("zip") && "border-destructive ring-destructive focus-visible:ring-destructive")}
+                />
               </div>
               <div className="flex flex-col gap-1.5 sm:col-span-2">
                 <Label htmlFor="notes">Notes (optional)</Label>
-                <Textarea id="notes" value={form.notes} onChange={set("notes")} placeholder="Leave at door, ring bell, etc." className="min-h-16 bg-white" />
+                <Textarea
+                  id="notes"
+                  value={form.notes}
+                  onChange={set("notes")}
+                  placeholder="Leave at door, ring bell, etc."
+                  className="min-h-16 bg-white"
+                />
               </div>
             </div>
           </Card>
@@ -227,7 +339,7 @@ export function CheckoutView() {
                 Payment method
               </h2>
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {PAYMENTS.map((p) => {
                 const selected = payment === p.id;
                 return (
@@ -259,7 +371,7 @@ export function CheckoutView() {
               })}
             </div>
             <p className="text-[11px] text-[var(--color-dowgnut-blue-dark)]/50">
-              🔒 Secured by FPX / TNG eWallet. You'll be redirected to complete payment.
+              🔒 Secured by FPX / SenangPay. You'll be redirected to complete payment.
             </p>
           </Card>
         </div>

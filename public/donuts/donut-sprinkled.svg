@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" fill="none">
+  <!-- Drop shadow -->
+  <ellipse cx="100" cy="175" rx="70" ry="8" fill="#07334F" opacity="0.12"/>
+  <!-- Dough body (sprinkled — golden dough) -->
+  <circle cx="100" cy="100" r="80" fill="#D4A574"/>
+  <!-- Dough inner ring -->
+  <circle cx="100" cy="100" r="28" fill="#FFF9E8"/>
+  <!-- Glaze (sprinkled — orange/pink) -->
+  <path d="M100 22 A78 78 0 1 1 99.99 22 Z M100 58 A42 42 0 1 0 100.01 58 Z" fill="#F0A55A" fill-rule="evenodd"/>
+  <!-- Glaze highlight -->
+  <path d="M55 55 Q70 35 100 30 Q130 35 145 55" stroke="#FFB347" stroke-width="4" stroke-linecap="round" opacity="0.6" fill="none"/>
+  <!-- Rainbow sprinkles -->
+  <rect x="60" y="45" width="8" height="3" rx="1.5" fill="#FF6B6B" transform="rotate(25 64 46)"/>
+  <rect x="130" y="50" width="8" height="3" rx="1.5" fill="#4ECDC4" transform="rotate(-15 134 51)"/>
+  <rect x="45" y="80" width="8" height="3" rx="1.5" fill="#FFE66D" transform="rotate(60 49 81)"/>
+  <rect x="150" y="85" width="8" height="3" rx="1.5" fill="#A8E6CF" transform="rotate(-45 154 86)"/>
+  <rect x="55" y="130" width="8" height="3" rx="1.5" fill="#FF8B8B" transform="rotate(10 59 131)"/>
+  <rect x="135" y="135" width="8" height="3" rx="1.5" fill="#B8B8FF" transform="rotate(-30 139 136)"/>
+  <rect x="70" y="40" width="8" height="3" rx="1.5" fill="#FFD3B6" transform="rotate(40 74 41)"/>
+  <rect x="120" y="145" width="8" height="3" rx="1.5" fill="#C7CEEA" transform="rotate(-50 124 146)"/>
+  <rect x="38" y="110" width="8" height="3" rx="1.5" fill="#FF6B6B" transform="rotate(75 42 111)"/>
+  <rect x="155" y="115" width="8" height="3" rx="1.5" fill="#4ECDC4" transform="rotate(-20 159 116)"/>
+  <!-- Inner ring edge -->
+  <circle cx="100" cy="100" r="28" fill="none" stroke="#B8860B" stroke-width="2" opacity="0.3"/>
+  <!-- Glaze shine -->
+  <ellipse cx="75" cy="60" rx="25" ry="12" fill="#FFF" opacity="0.2" transform="rotate(-30 75 60)"/>
+</svg>

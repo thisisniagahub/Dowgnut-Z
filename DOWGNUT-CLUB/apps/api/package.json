@@ -1,0 +1,17 @@
+{
+  "name": "dowgnut-club",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev:web": "pnpm --filter @dowgnut/web dev",
+    "dev:admin": "pnpm --filter @dowgnut/admin dev",
+    "build:web": "pnpm --filter @dowgnut/web build",
+    "build:admin": "pnpm --filter @dowgnut/admin build",
+    "build": "pnpm build:web && pnpm build:admin",
+    "install:all": "pnpm install"
+  },
+  "devDependencies": {
+    "pnpm": "^9.0.0"
+  },
+  "packageManager": "pnpm@9.0.0"
+}

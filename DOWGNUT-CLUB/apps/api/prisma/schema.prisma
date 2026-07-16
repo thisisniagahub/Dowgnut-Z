@@ -1,0 +1,900 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// =================== CORE MODELS ===================
+
+model User {
+  id            String    @id @default(cuid())
+  phone         String    @unique
+  phoneVerified Boolean   @default(false)
+  email         String?   @unique
+  fullName      String?
+  avatarUrl     String?
+  birthDate     DateTime?
+  dowgCode      String    @unique @default(cuid())
+  referralCode  String    @unique @default(cuid())
+  role          String    @default("CUSTOMER")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  @@index([phone])
+  @@index([dowgCode])
+  @@index([role])
+  @@index([referralCode])
+  @@map("User")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  @@map("Session")
+}
+
+model OTPVerification {
+  id        String   @id @default(cuid())
+  phone     String
+  codeHash  String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+  userId    String?
+  @@index([phone])
+  @@index([expiresAt])
+  @@map("OTPVerification")
+}
+
+model Role {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  description String?
+  permissions String     @default("{}")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  @@map("Role")
+}
+
+model UserRole {
+  id     String @id @default(cuid())
+  userId String
+  roleId String
+  @@unique([userId, roleId])
+  @@map("UserRole")
+}
+
+model Profile {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  bio        String?
+  instagram  String?
+  tiktok     String?
+  avatarUrl  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  @@map("Profile")
+}
+
+// =================== PRODUCT CATALOG ===================
+
+model Category {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  description  String?
+  imageUrl     String?
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  @@map("Category")
+}
+
+model Product {
+  id           String   @id @default(cuid())
+  name         String
+  slug         String   @unique
+  description  String?
+  categoryId   String
+  basePrice    Float
+  imageUrl     String?
+  images       String   @default("")
+  tags         String   @default("")
+  isActive     Boolean  @default(true)
+  isFeatured   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  @@map("Product")
+}
+
+model ProductVariant {
+  id         String  @id @default(cuid())
+  productId  String
+  name       String
+  sku        String  @unique
+  price      Float
+  stock      Int     @default(0)
+  isActive   Boolean @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  @@map("ProductVariant")
+}
+
+model ProductAvailability {
+  id         String   @id @default(cuid())
+  productId  String
+  outletId   String?
+  startDate  DateTime?
+  endDate    DateTime?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  @@unique([productId, outletId])
+  @@map("ProductAvailability")
+}
+
+model Outlet {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  address     String
+  city        String
+  state       String
+  postalCode  String?
+  latitude    Float?
+  longitude   Float?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@map("Outlet")
+}
+
+// =================== DROPS ===================
+
+model Drop {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  description     String?
+  imageUrl        String?
+  startDate       DateTime
+  endDate         DateTime?
+  maxPerCustomer  Int      @default(10)
+  isActive        Boolean  @default(true)
+  isSecret        Boolean  @default(false)
+  waitlistEnabled Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  @@map("Drop")
+}
+
+model DropProduct {
+  id              String  @id @default(cuid())
+  dropId          String
+  productId       String
+  variantId       String?
+  stock           Int     @default(0)
+  maxPerCustomer  Int     @default(5)
+  sortOrder       Int     @default(0)
+  createdAt       DateTime @default(now())
+  @@unique([dropId, productId])
+  @@map("DropProduct")
+}
+
+model DropWaitlist {
+  id        String   @id @default(cuid())
+  dropId    String
+  userId    String
+  position  Int
+  notified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  @@unique([dropId, userId])
+  @@index([dropId, position])
+  @@map("DropWaitlist")
+}
+
+// =================== INVENTORY ===================
+
+model InventoryItem {
+  id                String   @id @default(cuid())
+  variantId         String
+  outletId          String
+  quantity          Int      @default(0)
+  reserved          Int      @default(0)
+  lowStockThreshold Int      @default(10)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  @@unique([variantId, outletId])
+  @@map("InventoryItem")
+}
+
+model InventoryMovement {
+  id        String   @id @default(cuid())
+  itemId    String
+  type      String
+  quantity  Int
+  reason    String?
+  reference String?
+  createdAt DateTime @default(now())
+  @@index([itemId, createdAt])
+  @@map("InventoryMovement")
+}
+
+// =================== CART ===================
+
+model Cart {
+  id        String   @id @default(cuid())
+  userId    String
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([userId, status])
+  @@map("Cart")
+}
+
+model CartItem {
+  id        String  @id @default(cuid())
+  cartId    String
+  variantId String
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([cartId, variantId])
+  @@map("CartItem")
+}
+
+// =================== ORDERS ===================
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique
+  userId          String
+  outletId        String?
+  type            String      @default("REGULAR")
+  status          String      @default("PENDING_PAYMENT")
+  subtotal        Float
+  discount        Float       @default(0)
+  deliveryFee     Float       @default(0)
+  total           Float
+  voucherId       String?
+  voucherCode     String?
+  notes           String?
+  customerName    String
+  customerPhone   String
+  customerEmail   String?
+  pickupTime      DateTime?
+  address         String?
+  addressLat      Float?
+  addressLng      Float?
+  groupOrderId    String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  completedAt     DateTime?
+  @@index([userId, createdAt])
+  @@index([outletId, status])
+  @@index([groupOrderId])
+  @@index([status, createdAt])
+  @@map("Order")
+}
+
+model OrderItem {
+  id         String  @id @default(cuid())
+  orderId    String
+  variantId  String
+  quantity   Int
+  price      Float
+  name       String
+  imageUrl   String?
+  createdAt  DateTime @default(now())
+  @@index([orderId])
+  @@map("OrderItem")
+}
+
+// =================== PAYMENTS ===================
+
+model Payment {
+  id              String         @id @default(cuid())
+  orderId         String         @unique
+  userId          String
+  provider        String
+  providerRef     String?
+  amount          Float
+  status          String         @default("PENDING")
+  paidAt          DateTime?
+  metadata        String?
+  webhookPayload  String?
+  idempotencyKey  String         @unique
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  @@index([status, createdAt])
+  @@index([provider, providerRef])
+  @@index([userId])
+  @@map("Payment")
+}
+
+model PaymentWebhook {
+  id           String   @id @default(cuid())
+  provider     String
+  eventType    String
+  payload      String
+  processed    Boolean  @default(false)
+  processedAt  DateTime?
+  errorMessage String?
+  createdAt    DateTime @default(now())
+  @@index([provider, processed])
+  @@index([createdAt])
+  @@map("PaymentWebhook")
+}
+
+// =================== VOUCHERS ===================
+
+model Voucher {
+  id                   String   @id @default(cuid())
+  code                 String   @unique
+  name                 String
+  description          String?
+  type                 String
+  discountType         String
+  discountValue        Float
+  minOrderValue        Float?
+  maxDiscount          Float?
+  usageLimit           Int?
+  usageCount           Int      @default(0)
+  perUserLimit         Int      @default(1)
+  validFrom            DateTime
+  validUntil           DateTime
+  isActive             Boolean  @default(true)
+  applicableProducts   String   @default("")
+  applicableCategories String   @default("")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  @@map("Voucher")
+}
+
+model UserVoucher {
+  id         String   @id @default(cuid())
+  userId     String
+  voucherId  String
+  redeemed   Boolean  @default(false)
+  redeemedAt DateTime?
+  orderId    String?
+  createdAt  DateTime @default(now())
+  @@unique([userId, voucherId])
+  @@map("UserVoucher")
+}
+
+// =================== WALLET ===================
+
+model Wallet {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  coinBalance  Int      @default(0)
+  cashBalance  Float    @default(0)
+  stampBalance Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  @@map("Wallet")
+}
+
+model WalletTransaction {
+  id              String   @id @default(cuid())
+  walletId        String
+  type            String
+  amount          Float
+  balanceAfter    Float
+  sourceType      String
+  sourceId        String
+  idempotencyKey  String   @unique
+  status          String   @default("POSTED")
+  metadata        String?
+  createdAt       DateTime @default(now())
+  @@index([walletId, createdAt])
+  @@index([sourceType, sourceId])
+  @@index([idempotencyKey])
+  @@map("WalletTransaction")
+}
+
+// =================== STAMP CARD ===================
+
+model StampCard {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  stamps    Int      @default(0)
+  completed Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("StampCard")
+}
+
+model StampEvent {
+  id           String   @id @default(cuid())
+  stampCardId  String
+  orderId      String?
+  count        Int
+  createdAt    DateTime @default(now())
+  @@index([stampCardId, createdAt])
+  @@map("StampEvent")
+}
+
+// =================== REWARDS ===================
+
+model RewardRule {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  trigger     String
+  condition   String   @default("{}")
+  reward      String   @default("{}")
+  isActive    Boolean  @default(true)
+  priority    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@map("RewardRule")
+}
+
+model FreebieVaultItem {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  icon        String?
+  unlockedAt  DateTime
+  expiresAt   DateTime?
+  isClaimed   Boolean  @default(false)
+  claimedAt   DateTime?
+  createdAt   DateTime @default(now())
+  @@index([userId, isClaimed])
+  @@map("FreebieVaultItem")
+}
+
+// =================== DOWG CODE & REFERRALS ===================
+
+model DowgCode {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  userId    String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  @@map("DowgCode")
+}
+
+model ReferralEvent {
+  id           String        @id @default(cuid())
+  codeId       String
+  referrerId   String
+  referredId   String?
+  orderId      String?
+  status       String        @default("PENDING")
+  attributedAt DateTime?
+  rewardedAt   DateTime?
+  expiresAt    DateTime?
+  createdAt    DateTime      @default(now())
+  @@index([codeId, status])
+  @@index([referrerId, createdAt])
+  @@index([referredId])
+  @@index([orderId])
+  @@map("ReferralEvent")
+}
+
+model ReferralAttribution {
+  id          String   @id @default(cuid())
+  eventId     String   @unique
+  referrerId  String
+  referredId  String
+  orderId     String
+  rewardType  String
+  rewardValue String
+  createdAt   DateTime @default(now())
+  @@index([referrerId, createdAt])
+  @@index([referredId])
+  @@map("ReferralAttribution")
+}
+
+// =================== CREATOR HUB ===================
+
+model CreatorProfile {
+  id              String       @id @default(cuid())
+  userId          String       @unique
+  displayName     String
+  bio             String?
+  avatarUrl       String?
+  instagram       String?
+  tiktok          String?
+  youtube         String?
+  status          String       @default("PENDING")
+  appliedAt       DateTime     @default(now())
+  approvedAt      DateTime?
+  approvedBy      String?
+  rejectedAt      DateTime?
+  rejectedBy      String?
+  rejectionReason String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  @@index([status])
+  @@map("CreatorProfile")
+}
+
+model Campaign {
+  id              String        @id @default(cuid())
+  name            String
+  slug            String        @unique
+  description     String?
+  type            String
+  startDate       DateTime
+  endDate         DateTime?
+  budget          Float?
+  spent           Float       @default(0)
+  isActive        Boolean     @default(true)
+  rules           String      @default("{}")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  @@index([isActive, startDate, endDate])
+  @@map("Campaign")
+}
+
+model CampaignAsset {
+  id        String   @id @default(cuid())
+  campaignId String
+  type      String
+  url       String
+  meta      String?
+  createdAt DateTime @default(now())
+  @@map("CampaignAsset")
+}
+
+model Commission {
+  id              String        @id @default(cuid())
+  campaignId      String?
+  creatorId       String
+  orderId         String
+  productId       String?
+  rateType        String
+  rateValue       Float
+  amount          Float
+  status          String        @default("PENDING")
+  attributedAt    DateTime      @default(now())
+  approvedAt      DateTime?
+  paidAt          DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  @@index([creatorId, status])
+  @@index([campaignId])
+  @@index([orderId])
+  @@map("Commission")
+}
+
+model CreatorCampaignAssignment {
+  id          String   @id @default(cuid())
+  creatorId   String
+  campaignId  String
+  assignedAt  DateTime @default(now())
+  assignedBy  String?
+  isActive    Boolean  @default(true)
+  @@unique([creatorId, campaignId])
+  @@map("CreatorCampaignAssignment")
+}
+
+model CreatorCampaignProduct {
+  id             String   @id @default(cuid())
+  campaignId     String
+  productId      String
+  commissionRate Float
+  createdAt      DateTime @default(now())
+  @@unique([campaignId, productId])
+  @@map("CreatorCampaignProduct")
+}
+
+model CreatorCommission {
+  id              String      @id @default(cuid())
+  creatorId       String
+  orderId         String
+  productId       String?
+  amount          Float
+  rateType        String
+  rateValue       Float
+  status          String      @default("PENDING")
+  attributedAt    DateTime    @default(now())
+  approvedAt      DateTime?
+  paidAt          DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  @@index([creatorId, status])
+  @@index([orderId])
+  @@map("CreatorCommission")
+}
+
+model CreatorPayout {
+  id          String       @id @default(cuid())
+  creatorId   String
+  amount      Float
+  status      String       @default("PENDING")
+  periodStart DateTime
+  periodEnd   DateTime
+  requestedAt DateTime     @default(now())
+  approvedAt  DateTime?
+  paidAt      DateTime?
+  paidBy      String?
+  notes       String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  @@index([creatorId, status])
+  @@index([status, createdAt])
+  @@map("CreatorPayout")
+}
+
+model ContentSubmission {
+  id          String   @id @default(cuid())
+  creatorId   String
+  campaignId  String?
+  type        String
+  url         String
+  title       String?
+  description String?
+  status      String   @default("pending")
+  reward      String?
+  reviewedAt  DateTime?
+  reviewedBy  String?
+  createdAt   DateTime @default(now())
+  @@index([creatorId, status])
+  @@index([campaignId])
+  @@map("ContentSubmission")
+}
+
+// =================== PARTNER COUNTERS ===================
+
+model PartnerProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  companyName  String
+  contactName  String
+  contactPhone String
+  contactEmail String?
+  status       String   @default("pending")
+  appliedAt    DateTime @default(now())
+  approvedAt   DateTime?
+  approvedBy   String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  @@map("PartnerProfile")
+}
+
+model PartnerOutlet {
+  id          String   @id @default(cuid())
+  partnerId   String
+  outletId    String
+  assignedAt  DateTime @default(now())
+  isActive    Boolean  @default(true)
+  @@unique([partnerId, outletId])
+  @@map("PartnerOutlet")
+}
+
+model PartnerStock {
+  id        String   @id @default(cuid())
+  partnerId String
+  variantId String
+  outletId  String
+  quantity  Int      @default(0)
+  reserved  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([partnerId, variantId, outletId])
+  @@map("PartnerStock")
+}
+
+model PartnerOrder {
+  id          String   @id @default(cuid())
+  partnerId   String
+  outletId    String
+  orderId     String   @unique
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([partnerId, status])
+  @@index([outletId, status])
+  @@map("PartnerOrder")
+}
+
+model PartnerSettlement {
+  id          String   @id @default(cuid())
+  partnerId   String
+  periodStart DateTime
+  periodEnd   DateTime
+  grossSales  Float
+  commission  Float
+  netAmount   Float
+  status      String   @default("pending")
+  settledAt   DateTime?
+  settledBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([partnerId, periodStart])
+  @@index([status])
+  @@map("PartnerSettlement")
+}
+
+model PartnerStockRequest {
+  id        String   @id @default(cuid())
+  partnerId String
+  variantId String
+  outletId  String
+  quantity  Int
+  status    String   @default("pending")
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([partnerId, status])
+  @@map("PartnerStockRequest")
+}
+
+// =================== GROUP ORDERS ===================
+
+model GroupOrder {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  initiatorId String
+  status      String   @default("collecting")
+  targetQty   Int
+  currentQty  Int      @default(0)
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  completedAt DateTime?
+  @@map("GroupOrder")
+}
+
+model GroupOrderParticipant {
+  id            String   @id @default(cuid())
+  groupOrderId  String
+  userId        String
+  quantity      Int
+  notes         String?
+  createdAt     DateTime @default(now())
+  @@unique([groupOrderId, userId])
+  @@map("GroupOrderParticipant")
+}
+
+// =================== UGC ===================
+
+model UGCSubmission {
+  id          String   @id @default(cuid())
+  userId      String
+  campaignId  String?
+  type        String
+  url         String
+  title       String?
+  description String?
+  status      String   @default("pending")
+  reward      String?
+  reviewedAt  DateTime?
+  reviewedBy  String?
+  createdAt   DateTime @default(now())
+  @@index([userId, status])
+  @@index([campaignId])
+  @@map("UGCSubmission")
+}
+
+// =================== FRAUD & NOTIFICATIONS ===================
+
+model FraudFlag {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String
+  severity    String
+  description String
+  evidence    String?
+  status      String   @default("open")
+  reviewedAt  DateTime?
+  reviewedBy  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([userId, status])
+  @@index([status, createdAt])
+  @@map("FraudFlag")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  body      String
+  data      String?
+  read      Boolean  @default(false)
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+  @@index([userId, read, createdAt])
+  @@map("Notification")
+}
+
+// =================== ADMIN & AI ===================
+
+model AdminAuditLog {
+  id        String   @id @default(cuid())
+  adminId   String
+  action    String
+  entity    String
+  entityId  String
+  before    String?
+  after     String?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  @@index([adminId, createdAt])
+  @@index([entity, entityId])
+  @@index([createdAt])
+  @@map("AdminAuditLog")
+}
+
+model AiConversation {
+  id        String   @id @default(cuid())
+  userId    String
+  role      String
+  sessionId String
+  title     String?
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("AiConversation")
+}
+
+model AiMessage {
+  id             String   @id @default(cuid())
+  conversationId String
+  role           String
+  content        String
+  tokensIn       Int?
+  tokensOut      Int?
+  model          String?
+  createdAt      DateTime @default(now())
+  @@index([conversationId, createdAt])
+  @@map("AiMessage")
+}
+
+model AiToolCall {
+  id             String   @id @default(cuid())
+  conversationId String
+  toolName       String
+  role           String
+  status         String
+  inputRedacted  String
+  outputRedacted String
+  createdAt      DateTime @default(now())
+  @@index([conversationId, createdAt])
+  @@map("AiToolCall")
+}
+
+model AiApproval {
+  id              String   @id @default(cuid())
+  conversationId  String
+  actionType      String
+  requestedById   String
+  payload         String
+  status          String   @default("pending")
+  approvedById    String?
+  approvedAt      DateTime?
+  rejectedAt      DateTime?
+  createdAt       DateTime @default(now())
+  @@index([conversationId])
+  @@index([status])
+  @@map("AiApproval")
+}
+
+model AiRateLimit {
+  id            String   @id @default(cuid())
+  userId        String
+  role          String
+  windowStart   DateTime
+  requestCount  Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  @@unique([userId, role, windowStart])
+  @@map("AiRateLimit")
+}

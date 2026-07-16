@@ -17,8 +17,10 @@ import { AdminDashboard } from "@/components/dowgnut/admin-dashboard";
 import { DetailModal } from "@/components/dowgnut/detail-modal";
 import { CartDrawer } from "@/components/dowgnut/cart-drawer";
 import { AIConcierge } from "@/components/dowgnut/ai-concierge";
-import { AIDesigner } from "@/components/dowgnut/ai-designer";
+import { DuitNowQRBurst } from "@/components/dowgnut/DuitNowQRBurst";
 import { ShopHome } from "@/components/dowgnut/shop-home";
+import { FestivalBanner } from "@/components/dowgnut/FestivalShaders";
+import { GlazeWipeTransition } from "@/components/dowgnut/GlazeWipeTransition";
 
 export default function Home() {
   const view = useShop((s) => s.view);
@@ -32,9 +34,10 @@ export default function Home() {
   const isShopSlider = view === "shop" || view === "slider";
 
   return (
-    <>
-      <SplashScreen />
-      <DowgnutHeader />
+      <>
+        <SplashScreen />
+        <FestivalBanner />
+        <DowgnutHeader />
       <main className="relative flex flex-1 flex-col overflow-hidden pb-16">
         <AnimatePresence mode="wait">
           {/* Shop + Slider share a synchronized crossfade+scale transition */}
@@ -75,14 +78,14 @@ export default function Home() {
         </AnimatePresence>
       </main>
 
-      {view !== "shop" && view !== "slider" && <DowgnutFooter />}
-      {view !== "shop" && view !== "slider" && <BottomNav />}
+      <DowgnutFooter />
+      <BottomNav />
 
       <DetailModal />
-      <CartDrawer />
-      {/* AI Concierge only on non-shop/slider views (keeps home+slider minimal) */}
-      {view !== "shop" && view !== "slider" && <AIConcierge />}
-      <AIDesigner />
-    </>
+                  <CartDrawer />
+                  <AIConcierge />
+                  {view === "duitnow-qr" && <DuitNowQRBurst />}
+                        <GlazeWipeTransition />
+                      </>
   );
 }

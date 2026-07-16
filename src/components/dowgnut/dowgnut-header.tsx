@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, Menu, Sparkles } from "lucide-react";
+import { ShoppingCart, Menu, Sparkles, Calendar } from "lucide-react";
 import { useShop } from "@/store/use-shop";
+import { useFestival, FestivalToggle } from "./FestivalShaders";
+import { AuthModal } from "./auth-modal";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -18,6 +20,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function DowgnutHeader() {
   const view = useShop((s) => s.view);
@@ -29,6 +38,9 @@ export function DowgnutHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const cartCount = cart.reduce((n, c) => n + c.quantity, 0);
+
+  // Festival banner is shown at top of page via FestivalBanner component
+  // Header just shows the toggle
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -147,6 +159,12 @@ export function DowgnutHeader() {
               Your Cart
             </TooltipContent>
           </Tooltip>
+
+          {/* Festival Toggle */}
+          <FestivalToggle />
+
+          {/* Auth Modal - User button or Sign In button */}
+          <AuthModal />
 
           {/* Mobile menu */}
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>

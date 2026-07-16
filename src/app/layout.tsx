@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Archivo_Black } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { FestivalProvider } from "@/components/dowgnut/FestivalShaders";
+import { Providers } from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -69,7 +71,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${archivoBlack.variable} antialiased bg-background text-foreground min-h-screen flex flex-col overscroll-none`}
       >
-        {children}
+        <Providers>
+          <FestivalProvider>
+            {children}
+          </FestivalProvider>
+        </Providers>
         <Toaster />
       </body>
     </html>

@@ -20,7 +20,8 @@ export type ShopView =
   | "checkout"
   | "orders"
   | "tracking"
-  | "admin";
+  | "admin"
+  | "duitnow-qr";
 
 interface CheckoutPayload {
   customerName: string;
@@ -66,9 +67,12 @@ interface ShopState {
   trackingCustomerName: string;
 
   // orders cache
-  orders: Order[];
+    orders: Order[];
 
-  initialised: boolean;
+    // tapau physics
+    tapauTrigger: { donut: Donut; resolve: () => void } | null;
+
+    initialised: boolean;
 
   // actions
   setView: (v: ShopView) => void;
@@ -268,7 +272,12 @@ export const useShop = create<ShopState>()(
       },
       setCartOpen: (open) => set({ cartOpen: open }),
 
-      loadFavorites: async () => {
+            // Tapau physics trigger
+            tapauTrigger: null as { donut: Donut; resolve: () => void } | null,
+            setTapauTrigger: (trigger: { donut: Donut; resolve: () => void } | null) => 
+              set({ tapauTrigger: trigger }),
+
+            loadFavorites: async () => {
         try {
           const data = await apiFetch<Favorite[]>(`/api/favorites`);
           set({ favorites: data || [] });
@@ -296,9 +305,15 @@ export const useShop = create<ShopState>()(
         }
       },
       isFavorite: (donutId) =>
-        get().favorites.some((f) => f.donutId === donutId),
+              get().favorites.some((f) => f.donutId === donutId),
 
-      checkout: async (payload) => {
+            // Trigger tapau physics animation
+            triggerTapau: (donut: Donut) =>
+              new Promise<void>((resolve) => {
+                set({ tapauTrigger: { donut, resolve } });
+              }),
+
+            checkout: async (payload) => {
         const order = await apiFetch<Order>(`/api/orders`, {
           method: "POST",
           body: JSON.stringify({ ...payload, sessionId: get().sessionId }),
@@ -323,9 +338,12 @@ export const useShop = create<ShopState>()(
       stopTracking: () => set({ trackingOrderId: null }),
 
       setConciergeOpen: (open) => set({ conciergeOpen: open }),
-      setDesignerOpen: (open) => set({ designerOpen: open }),
+            setDesignerOpen: (open) => set({ designerOpen: open }),
 
-      aiConcierge: async (messages) => {
+            // Clear tapau trigger after animation
+            clearTapauTrigger: () => set({ tapauTrigger: null }),
+
+            aiConcierge: async (messages) => {
         return apiFetch<{ reply: string; donuts: Donut[] }>(`/api/ai/concierge`, {
           method: "POST",
           body: JSON.stringify({ messages, sessionId: get().sessionId }),

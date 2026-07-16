@@ -59,3 +59,12 @@ prompt
 server.log
 # Skills directory
 /skills/
+
+# DOWGNUT-CLUB monorepo (separate project, don't commit build artifacts)
+DOWGNUT-CLUB/**/node_modules/
+DOWGNUT-CLUB/**/dist/
+DOWGNUT-CLUB/**/.next/
+DOWGNUT-CLUB/**/.pnpm-store/
+
+# Temp Python scripts
+fix_*.py

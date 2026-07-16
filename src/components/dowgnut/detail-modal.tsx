@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import { Heart, Minus, Plus, Loader2, Star, X } from "lucide-react";
 import { useShop } from "@/store/use-shop";
@@ -21,6 +21,19 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { Donut3DViewer } from "./Donut3DViewer";
+
+function Loader() {
+  return (
+    <div className="flex items-center justify-center w-full h-64 md:h-80">
+      <motion.div
+        className="w-10 h-10 border-4 border-[var(--color-dowgnut-pink)] border-t-transparent rounded-full"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+      />
+    </div>
+  );
+}
 
 export function DetailModal() {
   const open = useShop((s) => s.detailOpen);
@@ -58,9 +71,9 @@ export function DetailModal() {
       <Dialog open={open} onOpenChange={(o) => !o && closeDetail()}>
         <DialogContent className="bg-transparent p-0">
           <DialogTitle className="sr-only">Loading</DialogTitle>
-          <div className="flex items-center justify-center py-8 text-[var(--color-dowgnut-blue)]">
-            <Loader2 className="size-6 animate-spin" />
-          </div>
+          <Suspense fallback={<Loader />}>
+            <Loader />
+          </Suspense>
         </DialogContent>
       </Dialog>
     );
@@ -134,290 +147,290 @@ export function DetailModal() {
     <Dialog open={open} onOpenChange={(o) => !o && closeDetail()}>
       <DialogContent
         showCloseButton={false}
-        className="!max-w-none !w-screen !h-screen !max-h-none !rounded-none !border-none !p-0 !shadow-none !gap-0 !translate-x-0 !translate-y-0 !left-0 !top-0 overflow-y-auto bg-[var(--color-dowgnut-lime-bright)]"
+        className="max-w-4xl bg-transparent p-0 overflow-hidden"
       >
-        <DialogTitle className="sr-only">{donut.name}</DialogTitle>
-
-        {/* Close */}
-        <button
-          onClick={closeDetail}
-          aria-label="Close"
-          className="fixed right-4 top-4 z-30 inline-flex size-10 items-center justify-center rounded-full bg-[var(--color-dowgnut-blue-dark)]/10 text-[var(--color-dowgnut-blue-dark)] transition-colors hover:bg-[var(--color-dowgnut-blue-dark)]/20"
-        >
-          <X className="size-5" />
-        </button>
-
-        <div className="grid min-h-screen grid-cols-1 md:grid-cols-2">
-          {/* Left: big rotating donut — frameless */}
-          <div className="relative flex min-h-[40vh] items-center justify-center p-6 md:min-h-screen">
+        <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-0">
+          {/* Left: 3D Donut Viewer */}
+          <div className="relative bg-[var(--color-dowgnut-lime-bright)] p-4 md:p-8 lg:p-12">
+            <Suspense fallback={<Loader />}>
+              <Donut3DViewer
+                donut={donut}
+                size={400}
+                autoRotate={true}
+                interactive={true}
+                showSprinkles={true}
+                onAddToCart={onAdd}
+                onToggleFavorite={onFav}
+                isFavorite={fav}
+              />
+            </Suspense>
+            
+            {/* Close button */}
+            <button
+              onClick={() => closeDetail()}
+              className="absolute top-4 right-4 z-10 size-10 rounded-full bg-white/80 backdrop-blur-sm text-[var(--color-dowgnut-blue-dark)]/60 hover:text-[var(--color-dowgnut-blue-dark)] hover:bg-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-dowgnut-pink)]"
+              aria-label="Close"
+            >
+              <X className="size-5" />
+            </button>
+            
+            {/* Favorite button overlay */}
             <button
               onClick={onFav}
-              aria-label={fav ? "Remove favorite" : "Add favorite"}
-              className={cn(
-                "absolute left-5 top-5 z-20 inline-flex size-12 items-center justify-center rounded-full transition-colors",
-                fav
-                  ? "bg-[var(--color-dowgnut-pink)] text-white"
-                  : "bg-white/70 text-[var(--color-dowgnut-pink)] hover:bg-white"
-              )}
+              className="absolute top-4 left-4 z-10 size-10 rounded-full bg-white/80 backdrop-blur-sm transition-all hover:scale-110"
+              aria-label={fav ? "Remove from favorites" : "Add to favorites"}
             >
-              <Heart className={cn("size-5", fav && "fill-current")} />
-            </button>
-
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 24, repeat: Infinity, ease: "linear" }}
-              className="relative"
-            >
-              <img
-                src={donut.imgUrl}
-                alt={donut.name}
-                className="size-72 object-contain sm:size-80 md:size-96"
-                draggable={false}
+              <Heart
+                className="size-5 transition-colors"
+                fill={fav ? "currentColor" : "none"}
+                stroke="currentColor"
+                strokeWidth={2}
+                style={{ 
+                  color: fav ? "#f05a9b" : "var(--color-dowgnut-blue-dark)" 
+                }}
               />
-            </motion.div>
-
-            {donut.featured && (
-              <span className="absolute bottom-5 left-5 text-xs font-bold uppercase tracking-[0.2em] text-[var(--color-dowgnut-blue-dark)]/50">
-                ★ Featured
-              </span>
-            )}
+            </button>
           </div>
 
-          {/* Right: minimal details with 3D Flip Card */}
-          <div className="flex flex-col justify-center px-6 py-8 sm:px-10 sm:py-12 md:min-h-screen md:px-12 lg:px-16 [perspective:1000px]">
-            <motion.div
-              animate={{ rotateY: isFlipped ? 180 : 0 }}
-              transition={{ duration: 0.6, ease: "easeInOut" }}
-              style={{ transformStyle: "preserve-3d" }}
-              className="relative w-full"
-            >
-              {/* FRONT SIDE */}
-              <div
-                style={{ backfaceVisibility: "hidden" }}
-                className={cn(
-                  "flex flex-col gap-5 w-full",
-                  isFlipped && "pointer-events-none"
-                )}
-              >
-                {/* Type + rating — minimal line */}
-                <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-dowgnut-blue-dark)]/50">
-                  <span>{donut.type}</span>
-                  <span>·</span>
-                  <span className="inline-flex items-center gap-0.5">
-                    <Star className="size-3 fill-[var(--color-dowgnut-pink)] text-[var(--color-dowgnut-pink)]" />
-                    {donut.rating.toFixed(1)}
+          {/* Right: Details & Actions */}
+          <div className="bg-white flex flex-col">
+            {/* Header */}
+            <div className="p-4 md:p-6 border-b border-[var(--color-dowgnut-blue-dark)]/10">
+              <p className="graffiti-text text-xs md:text-sm text-[var(--color-dowgnut-pink-dark)] uppercase tracking-wide">
+                {donut.type} · Fresh Daily
+              </p>
+              <h2 className="graffiti-text text-2xl md:text-3xl lg:text-4xl text-[var(--color-dowgnut-blue-dark)] leading-none mt-1">
+                {donut.name}
+              </h2>
+              <div className="flex items-center gap-3 mt-3">
+                <span className="flex items-center gap-1 text-yellow-500 text-sm font-medium">
+                  <Star className="size-4 fill-current" /> {donut.rating.toFixed(1)}
+                </span>
+                <span className="text-xs text-[var(--color-dowgnut-blue-dark)]/50">
+                  {donut.calories} kcal · {donut.sugar}g sugar · {donut.fat}g fat
+                </span>
+              </div>
+              <p className="mt-3 text-sm text-[var(--color-dowgnut-blue-dark)]/70 leading-relaxed">
+                {donut.description}
+              </p>
+              <div className="flex flex-wrap gap-2 mt-4">
+                {donut.tags?.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider rounded-full bg-[var(--color-dowgnut-cream)] text-[var(--color-dowgnut-blue-dark)]"
+                  >
+                    {tag}
                   </span>
-                  <span>·</span>
-                  <span>{donut.calories} cal</span>
+                ))}
+              </div>
+            </div>
+
+            {/* Details & Actions */}
+            <div className="flex-1 flex flex-col p-4 md:p-6 overflow-y-auto">
+              {/* Stock & Price */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <span className={cn(
+                    "inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold",
+                    donut.stock > 5
+                      ? "bg-green-100 text-green-700"
+                      : donut.stock > 0
+                      ? "bg-yellow-100 text-yellow-700"
+                      : "bg-red-100 text-red-700"
+                  )}>
+                    {donut.stock > 0 ? `${donut.stock} left` : "Sold out"}
+                  </span>
                 </div>
-
-                {/* Name — clean, big */}
-                <h2 className="graffiti-text text-3xl leading-[0.95] text-[var(--color-dowgnut-blue-dark)] sm:text-4xl">
-                  {donut.name}
-                </h2>
-
-                {/* Price — bold, clean */}
-                <p className="text-2xl font-black text-[var(--color-dowgnut-pink-dark)]">
-                  RM{donut.price.toFixed(2)}
-                </p>
-
-                {/* Description — minimal */}
-                <p className="max-w-prose text-sm leading-relaxed text-[var(--color-dowgnut-blue-dark)]/70">
-                  {donut.description}
-                </p>
-
-                {/* Stock — minimal */}
-                {donut.stock > 0 ? (
-                  <p className="text-xs font-medium text-[var(--color-dowgnut-blue-dark)]/50">
-                    {donut.stock} in stock
+                <div className="text-right">
+                  <p className="graffiti-text text-2xl md:text-3xl font-black text-[var(--color-dowgnut-blue-dark)]">
+                    RM{donut.price.toFixed(2)}
                   </p>
-                ) : (
-                  <p className="text-xs font-semibold text-destructive">Sold out</p>
-                )}
-
-                {/* Qty — minimal */}
-                <div className="flex items-center gap-4">
-                  <span className="text-xs uppercase tracking-[0.15em] text-[var(--color-dowgnut-blue-dark)]/40">
-                    Qty
-                  </span>
-                  <div className="inline-flex items-center gap-1">
-                    <button
-                      onClick={() => setQty((q) => Math.max(1, q - 1))}
-                      className="inline-flex size-10 items-center justify-center text-[var(--color-dowgnut-blue-dark)] transition-colors hover:text-[var(--color-dowgnut-pink)]"
-                      aria-label="Decrease quantity"
-                    >
-                      <Minus className="size-4" />
-                    </button>
-                    <span className="min-w-8 text-center text-lg font-bold text-[var(--color-dowgnut-blue-dark)]">
-                      {qty}
-                    </span>
-                    <button
-                      onClick={() => setQty((q) => Math.min(donut.stock || 99, q + 1))}
-                      className="inline-flex size-10 items-center justify-center text-[var(--color-dowgnut-blue-dark)] transition-colors hover:text-[var(--color-dowgnut-pink)]"
-                      aria-label="Increase quantity"
-                    >
-                      <Plus className="size-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Actions — minimal, full width */}
-                <div className="mt-2 flex flex-col gap-2">
-                  <Button
-                    onClick={() => onAdd(true)}
-                    disabled={donut.stock <= 0}
-                    className="h-12 w-full rounded-full bg-[var(--color-dowgnut-blue-dark)] text-sm font-semibold uppercase tracking-[0.15em] text-white hover:bg-[var(--color-dowgnut-blue)]"
-                  >
-                    Add to cart · RM{(donut.price * qty).toFixed(2)}
-                  </Button>
-                  <button
-                    onClick={() => onAdd(false)}
-                    disabled={donut.stock <= 0}
-                    className="h-10 w-full text-xs font-medium uppercase tracking-[0.15em] text-[var(--color-dowgnut-blue-dark)]/50 transition-colors hover:text-[var(--color-dowgnut-pink)] disabled:opacity-40"
-                  >
-                    Add without opening cart
-                  </button>
-
-                  <Button
-                    onClick={() => setIsFlipped(true)}
-                    variant="outline"
-                    className="mt-2 h-10 w-full rounded-full border-[var(--color-dowgnut-blue-dark)]/20 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--color-dowgnut-blue-dark)] hover:bg-[var(--color-dowgnut-blue-dark)]/5"
-                  >
-                    Reviews ({reviews.length}) →
-                  </Button>
+                  <p className="text-xs text-[var(--color-dowgnut-blue-dark)]/50">per piece</p>
                 </div>
               </div>
 
-              {/* BACK SIDE */}
-              <div
-                style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
-                className={cn(
-                  "absolute inset-0 flex flex-col gap-4 w-full h-full",
-                  !isFlipped && "pointer-events-none"
-                )}
-              >
-                <div className="flex items-center justify-between border-b border-[var(--color-dowgnut-blue-dark)]/10 pb-2">
-                  <h3 className="graffiti-text text-xl text-[var(--color-dowgnut-blue-dark)]">
-                    Ulasan Donut
-                  </h3>
-                  <Button
-                    onClick={() => setIsFlipped(false)}
-                    variant="ghost"
-                    className="h-8 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--color-dowgnut-blue-dark)] hover:bg-transparent hover:text-[var(--color-dowgnut-pink)]"
+              {/* Quantity Stepper */}
+              <div className="mb-6">
+                <label className="block text-xs font-semibold text-[var(--color-dowgnut-blue-dark)]/60 uppercase tracking-wide mb-2">
+                  Quantity
+                </label>
+                <div className="inline-flex items-center rounded-full border border-[var(--color-dowgnut-blue-dark)]/15 overflow-hidden">
+                  <button
+                    onClick={() => setQty((q) => Math.max(1, q - 1))}
+                    disabled={qty <= 1}
+                    className={cn(
+                      "inline-flex size-10 items-center justify-center text-[var(--color-dowgnut-blue-dark)] hover:bg-[var(--color-dowgnut-cream)] transition-colors",
+                      qty <= 1 && "opacity-50 cursor-not-allowed"
+                    )}
+                    aria-label="Decrease quantity"
                   >
-                    ← Back
-                  </Button>
+                    <Minus className="size-4" />
+                  </button>
+                  <span className="min-w-[50px] text-center font-bold text-[var(--color-dowgnut-blue-dark)] text-base">
+                    {qty}
+                  </span>
+                  <button
+                    onClick={() => setQty((q) => q + 1)}
+                    disabled={donut.stock <= qty}
+                    className={cn(
+                      "inline-flex size-10 items-center justify-center text-[var(--color-dowgnut-blue-dark)] hover:bg-[var(--color-dowgnut-cream)] transition-colors",
+                      donut.stock <= qty && "opacity-50 cursor-not-allowed"
+                    )}
+                    aria-label="Increase quantity"
+                  >
+                    <Plus className="size-4" />
+                  </button>
                 </div>
+                <p className="mt-2 text-xs text-[var(--color-dowgnut-blue-dark)]/50">
+                  Total: <span className="font-bold">RM{(donut.price * qty).toFixed(2)}</span>
+                </p>
+              </div>
 
-                <div className="flex-1 overflow-y-auto scrollbar-dowgnut pr-1 space-y-3 max-h-[220px]">
-                  {reviews.length === 0 ? (
-                    <p className="text-xs text-[var(--color-dowgnut-blue-dark)]/40">
-                      No reviews yet — be the first.
-                    </p>
-                  ) : (
-                    reviews.map((r) => (
-                      <div key={r.id} className="text-sm">
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 mb-6">
+                <Button
+                  onClick={() => onAdd(false)}
+                  disabled={donut.stock <= 0 || submitting}
+                  className="flex-1 h-12 md:h-14 text-lg font-bold rounded-full bg-[var(--color-dowgnut-pink)] text-white hover:bg-[var(--color-dowgnut-pink-dark)] active:scale-[0.98] transition-all"
+                >
+                  Add to Cart
+                </Button>
+                <Button
+                  onClick={() => onAdd(true)}
+                  disabled={donut.stock <= 0 || submitting}
+                  variant="outline"
+                  className="flex-1 h-12 md:h-14 text-lg font-bold rounded-full border-2 border-[var(--color-dowgnut-blue)] text-[var(--color-dowgnut-blue)] hover:bg-[var(--color-dowgnut-blue)]/5 active:scale-[0.98] transition-all"
+                >
+                  Buy Now
+                </Button>
+              </div>
+
+              {/* Reviews Section */}
+              <div className="border-t border-[var(--color-dowgnut-blue-dark)]/10 pt-6">
+                <h3 className="graffiti-text text-lg font-bold text-[var(--color-dowgnut-blue-dark)] mb-4">
+                  Reviews ({reviews.length})
+                </h3>
+                
+                {reviews.length > 0 ? (
+                  <div className="space-y-4 mb-6 max-h-64 overflow-y-auto scrollbar-dowgnut">
+                    {reviews.map((review, i) => (
+                      <motion.div
+                        key={review.id || i}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05 }}
+                        className="flex flex-col gap-2 p-4 rounded-2xl bg-[var(--color-dowgnut-cream)]"
+                      >
                         <div className="flex items-center justify-between">
-                          <span className="font-semibold text-[var(--color-dowgnut-blue-dark)]">
-                            {r.author}
-                          </span>
-                          <span className="inline-flex items-center gap-0.5 text-[var(--color-dowgnut-pink)]">
-                            {Array.from({ length: 5 }).map((_, i) => (
+                          <p className="font-semibold text-[var(--color-dowgnut-blue-dark)]">
+                            {review.author}
+                          </p>
+                          <div className="flex items-center gap-1 text-yellow-500 text-sm">
+                            {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
-                                className={cn(
-                                  "size-3",
-                                  i < r.rating
-                                    ? "fill-[var(--color-dowgnut-pink)]"
-                                    : "text-[var(--color-dowgnut-blue-dark)]/15"
-                                )}
+                                className="size-4"
+                                fill={i < review.rating ? "currentColor" : "none"}
+                                stroke="currentColor"
                               />
                             ))}
-                          </span>
+                          </div>
                         </div>
-                        <p className="mt-0.5 text-xs leading-relaxed text-[var(--color-dowgnut-blue-dark)]/70">
-                          {r.comment}
+                        <p className="text-sm text-[var(--color-dowgnut-blue-dark)]/70 leading-relaxed">
+                          {review.comment}
                         </p>
-                      </div>
-                    ))
-                  )}
-                </div>
-
-                {/* Review form — minimal */}
-                <div className="border-t border-[var(--color-dowgnut-blue-dark)]/10 pt-3 flex flex-col gap-2">
-                  <div className="flex flex-col gap-2 sm:flex-row">
-                    <Input
-                      value={author}
-                      onChange={(e) => setAuthor(e.target.value)}
-                      placeholder="Name"
-                      className="h-9 flex-1 border-[var(--color-dowgnut-blue-dark)]/15 bg-white text-sm"
-                    />
-                    <Select value={rating} onValueChange={setRating}>
-                      <SelectTrigger className="h-9 w-full border-[var(--color-dowgnut-blue-dark)]/15 bg-white text-sm sm:w-28">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="5">★★★★★</SelectItem>
-                        <SelectItem value="4">★★★★</SelectItem>
-                        <SelectItem value="3">★★★</SelectItem>
-                        <SelectItem value="2">★★</SelectItem>
-                        <SelectItem value="1">★</SelectItem>
-                      </SelectContent>
-                    </Select>
+                        <p className="text-[10px] text-[var(--color-dowgnut-blue-dark)]/40 text-right">
+                          {new Date(review.createdAt).toLocaleDateString("en-MY", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </p>
+                      </motion.div>
+                    ))}
                   </div>
-                  <Textarea
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    placeholder="Share your thoughts…"
-                    className="min-h-12 border-[var(--color-dowgnut-blue-dark)]/15 bg-white text-sm"
-                  />
-                  <Button
-                    onClick={onReview}
-                    disabled={submitting}
-                    variant="ghost"
-                    className="h-9 self-start px-0 text-xs font-semibold uppercase tracking-[0.15em] text-[var(--color-dowgnut-blue-dark)] hover:bg-transparent hover:text-[var(--color-dowgnut-pink)]"
-                  >
-                    {submitting ? (
-                      <Loader2 className="size-3 animate-spin" />
-                    ) : (
-                      "Post review →"
-                    )}
-                  </Button>
+                ) : (
+                  <p className="text-sm text-[var(--color-dowgnut-blue-dark)]/50 text-center py-4">
+                    No reviews yet. Be the first to share your thoughts!
+                  </p>
+                )}
+
+                {/* Add Review Form */}
+                <div className="rounded-2xl bg-[var(--color-dowgnut-cream)] p-4">
+                  <h4 className="graffiti-text text-sm font-bold text-[var(--color-dowgnut-blue-dark)] mb-3">
+                    Leave a Review
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <Input
+                        placeholder="Your name"
+                        value={author}
+                        onChange={(e) => setAuthor(e.target.value)}
+                        className="bg-white/50 border-[var(--color-dowgnut-blue-dark)]/15 focus:border-[var(--color-dowgnut-pink)]"
+                      />
+                      <Select value={rating} onValueChange={setRating}>
+                        <SelectTrigger className="bg-white/50 border-[var(--color-dowgnut-blue-dark)]/15 focus:border-[var(--color-dowgnut-pink)]">
+                          <SelectValue placeholder="Rating" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {[5, 4, 3, 2, 1].map((r) => (
+                            <SelectItem key={r} value={String(r)}>
+                              {r} Star{r > 1 ? "s" : ""}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Textarea
+                      placeholder="Your thoughts on this donut..."
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      rows={3}
+                      className="bg-white/50 border-[var(--color-dowgnut-blue-dark)]/15 focus:border-[var(--color-dowgnut-pink)] resize-none"
+                    />
+                    <Button
+                      onClick={onReview}
+                      disabled={submitting || !author.trim() || !comment.trim()}
+                      className="w-full bg-[var(--color-dowgnut-pink)] hover:bg-[var(--color-dowgnut-pink-dark)] disabled:opacity-50"
+                    >
+                      {submitting ? "Posting..." : "Post Review"}
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </motion.div>
-          </div>
-        </div>
 
-        {/* Related — minimal, frameless */}
-        {related.length > 0 && (
-          <div className="px-6 pb-8 pt-2 sm:px-10 md:px-8">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-dowgnut-blue-dark)]/50">
-              More like this
-            </h3>
-            <div className="flex gap-4 overflow-x-auto scrollbar-dowgnut pb-2">
-              {related.map((d) => (
-                <button
-                  key={d.id}
-                  onClick={() => openDetail(d)}
-                  className="flex w-24 shrink-0 flex-col items-center gap-2 text-center"
-                >
-                  <img
-                    src={d.imgUrl}
-                    alt={d.name}
-                    className="size-20 object-contain transition-transform hover:scale-110"
-                  />
-                  <span className="line-clamp-2 text-xs font-medium text-[var(--color-dowgnut-blue-dark)]">
-                    {d.name}
-                  </span>
-                  <span className="text-xs font-bold text-[var(--color-dowgnut-pink-dark)]">
-                    RM{d.price.toFixed(2)}
-                  </span>
-                </button>
-              ))}
+              {/* Related Donuts */}
+              {related.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-[var(--color-dowgnut-blue-dark)]/10">
+                  <h3 className="graffiti-text text-lg font-bold text-[var(--color-dowgnut-blue-dark)] mb-3">
+                    More like this
+                  </h3>
+                  <div className="flex gap-3 overflow-x-auto scrollbar-dowgnut pb-2">
+                    {related.map((d) => (
+                      <button
+                        key={d.id}
+                        onClick={() => openDetail(d)}
+                        className="flex w-24 shrink-0 flex-col items-center gap-2 text-center"
+                      >
+                        <img
+                          src={d.imgUrl}
+                          alt={d.name}
+                          className="size-20 object-contain transition-transform hover:scale-110"
+                        />
+                        <span className="line-clamp-2 text-xs font-medium text-[var(--color-dowgnut-blue-dark)]">
+                          {d.name}
+                        </span>
+                        <span className="text-xs font-bold text-[var(--color-dowgnut-pink-dark)]">
+                          RM{d.price.toFixed(2)}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        )}
+        </div>
       </DialogContent>
     </Dialog>
   );
