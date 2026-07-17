@@ -1,12 +1,12 @@
 // DowgNut — Prisma schema for advanced donut e-commerce
-// PostgreSQL datasource (Vercel Postgres / Neon / Supabase)
+// SQLite datasource (ephemeral /tmp on Vercel) (Vercel Postgres / Neon / Supabase)
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
