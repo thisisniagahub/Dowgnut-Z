@@ -19,7 +19,7 @@ import { CartDrawer } from "@/components/dowgnut/cart-drawer";
 import { AIConcierge } from "@/components/dowgnut/ai-concierge";
 import { DuitNowQRBurst } from "@/components/dowgnut/DuitNowQRBurst";
 import { ShopHome } from "@/components/dowgnut/shop-home";
-import { FestivalBanner } from "@/components/dowgnut/FestivalShaders";
+import { FestivalProvider } from "@/components/dowgnut/FestivalShaders";
 import { GlazeWipeTransition } from "@/components/dowgnut/GlazeWipeTransition";
 
 export default function Home() {
@@ -36,7 +36,7 @@ export default function Home() {
   return (
       <>
         <SplashScreen />
-        <FestivalBanner />
+        {/* <FestivalBanner /> */}
         <DowgnutHeader />
       <main className="relative flex flex-1 flex-col overflow-hidden pb-16">
         <AnimatePresence mode="wait">
