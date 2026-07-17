@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { FestivalProvider } from "@/components/dowgnut/FestivalShaders";
 import { Providers } from "./providers";
+import { ClientOnly } from "@/components/dowgnut/ClientOnly";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -65,7 +66,9 @@ export default function RootLayout({
             {children}
           </FestivalProvider>
         </Providers>
-        <Toaster />
+        <ClientOnly>
+          <Toaster />
+        </ClientOnly>
       </body>
     </html>
   );
