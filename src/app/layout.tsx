@@ -50,14 +50,6 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-const SW_REGISTER = `
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  });
-}
-`;
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -65,9 +57,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: SW_REGISTER }} />
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${archivoBlack.variable} antialiased bg-background text-foreground min-h-screen flex flex-col overscroll-none`}
       >
