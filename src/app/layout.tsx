@@ -1,25 +1,27 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Archivo_Black } from "next/font/google";
+import { Anybody, JetBrains_Mono, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { FestivalProvider } from "@/components/dowgnut/FestivalShaders";
 import { Providers } from "./providers";
 import { ClientOnly } from "@/components/dowgnut/ClientOnly";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const archivoBlack = Archivo_Black({
+const anybody = Anybody({
   variable: "--font-display",
   subsets: ["latin"],
-  weight: ["400"],
+  weight: ["700", "800", "900"],
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const hankenGrotesk = Hanken_Grotesk({
+  variable: "--font-body",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -43,7 +45,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#07579B",
+  themeColor: "#536600",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -59,7 +61,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${archivoBlack.variable} antialiased bg-background text-foreground min-h-screen flex flex-col overscroll-none`}
+        className={`${anybody.variable} ${jetBrainsMono.variable} ${hankenGrotesk.variable} antialiased bg-background text-foreground min-h-screen flex flex-col overscroll-none`}
       >
         <Providers>
           <FestivalProvider>

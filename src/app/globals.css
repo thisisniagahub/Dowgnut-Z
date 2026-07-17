@@ -6,8 +6,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-body);
+  --font-mono: var(--font-mono);
   --font-display: var(--font-display);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -38,139 +38,230 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  /* Polished Grit: 0px radius — sharp corners everywhere */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
 
-  /* DowgNut brand tokens */
-  --color-dowgnut-blue: #07579b;
+  /* Polished Grit brand tokens */
+  --color-grit-lime: #536600;
+  --color-grit-lime-bright: #d9fb5f;
+  --color-grit-rose: #b21d67;
+  --color-grit-rose-bright: #fe5da2;
+  --color-grit-sapphire: #1e5bb8;
+  --color-grit-sapphire-light: #e7ecff;
+  --color-grit-charcoal: #1c1b1b;
+  --color-grit-surface: #fcf9f8;
+  --color-grit-surface-dim: #dcd9d9;
+  --color-grit-outline: #757964;
+  --color-grit-outline-variant: #c5c9b0;
+
+  /* Legacy DowgNut tokens (kept for compatibility) */
+  --color-dowgnut-blue: #1e5bb8;
   --color-dowgnut-blue-light: #2d7fc2;
   --color-dowgnut-blue-dark: #07334f;
-  --color-dowgnut-pink: #f05a9b;
-  --color-dowgnut-pink-soft: #ff9ac7;
-  --color-dowgnut-pink-dark: #c93373;
-  --color-dowgnut-lime: #e8f866;
+  --color-dowgnut-pink: #b21d67;
+  --color-dowgnut-pink-soft: #fe5da2;
+  --color-dowgnut-pink-dark: #8d004e;
+  --color-dowgnut-lime: #d9fb5f;
   --color-dowgnut-lime-bright: #f7ffd6;
-  --color-dowgnut-lime-dark: #b9c96a;
-  --color-dowgnut-cream: #fff9e8;
+  --color-dowgnut-lime-dark: #b3d33b;
+  --color-dowgnut-cream: #fcf9f8;
   --color-dowgnut-dough: #d4b36a;
   --color-dowgnut-grey: #aea294;
 }
 
 :root {
-  --radius: 0.75rem;
-  /* DowgNut brand-driven light theme */
-  --background: #f7ffd6;          /* neon lime bright — app bg */
-  --foreground: #07334f;          /* dark navy */
-  --card: #fff9e8;                /* cream surface */
-  --card-foreground: #07334f;
-  --popover: #fff9e8;
-  --popover-foreground: #07334f;
-  --primary: #07579b;             /* dowgnut blue */
+  /* Polished Grit — Light theme */
+  --radius: 0px;
+  --background: #fcf9f8;
+  --foreground: #1c1b1b;
+  --card: #ffffff;
+  --card-foreground: #1c1b1b;
+  --popover: #ffffff;
+  --popover-foreground: #1c1b1b;
+  --primary: #536600;
   --primary-foreground: #ffffff;
-  --secondary: #f05a9b;           /* frosting pink */
+  --secondary: #b21d67;
   --secondary-foreground: #ffffff;
-  --muted: #fff4d6;
-  --muted-foreground: #5b6b78;
-  --accent: #e8f866;              /* neon lime */
-  --accent-foreground: #07334f;
-  --destructive: #c93373;
-  --border: #07334f1a;
-  --input: #fff9e8;
-  --ring: #07579b;
-  --chart-1: #07579b;
-  --chart-2: #f05a9b;
-  --chart-3: #e8f866;
-  --chart-4: #d4b36a;
-  --chart-5: #07334f;
-  --sidebar: #fff9e8;
-  --sidebar-foreground: #07334f;
-  --sidebar-primary: #07579b;
+  --muted: #f0eded;
+  --muted-foreground: #454936;
+  --accent: #d9fb5f;
+  --accent-foreground: #1c1b1b;
+  --destructive: #ba1a1a;
+  --border: #1c1b1b;
+  --input: #ffffff;
+  --ring: #536600;
+  --chart-1: #536600;
+  --chart-2: #b21d67;
+  --chart-3: #1e5bb8;
+  --chart-4: #d9fb5f;
+  --chart-5: #1c1b1b;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1c1b1b;
+  --sidebar-primary: #536600;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e8f866;
-  --sidebar-accent-foreground: #07334f;
-  --sidebar-border: #07334f1a;
-  --sidebar-ring: #07579b;
+  --sidebar-accent: #d9fb5f;
+  --sidebar-accent-foreground: #1c1b1b;
+  --sidebar-border: #1c1b1b;
+  --sidebar-ring: #536600;
 }
 
 .dark {
-  --background: #07334f;
-  --foreground: #f7ffd6;
-  --card: #0a4368;
-  --card-foreground: #f7ffd6;
-  --popover: #0a4368;
-  --popover-foreground: #f7ffd6;
-  --primary: #f05a9b;
-  --primary-foreground: #ffffff;
-  --secondary: #e8f866;
-  --secondary-foreground: #07334f;
-  --muted: #0a4368;
-  --muted-foreground: #c9d6e0;
-  --accent: #2d7fc2;
-  --accent-foreground: #f7ffd6;
-  --destructive: #c93373;
-  --border: #f7ffd61a;
-  --input: #0a4368;
-  --ring: #f05a9b;
-  --chart-1: #f05a9b;
-  --chart-2: #e8f866;
-  --chart-3: #2d7fc2;
-  --chart-4: #d4b36a;
-  --chart-5: #f7ffd6;
-  --sidebar: #0a4368;
-  --sidebar-foreground: #f7ffd6;
-  --sidebar-primary: #f05a9b;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #2d7fc2;
-  --sidebar-accent-foreground: #f7ffd6;
-  --sidebar-border: #f7ffd61a;
-  --sidebar-ring: #f05a9b;
+  /* Polished Grit — Dark theme */
+  --background: #1c1b1b;
+  --foreground: #f3f0ef;
+  --card: #313030;
+  --card-foreground: #f3f0ef;
+  --popover: #313030;
+  --popover-foreground: #f3f0ef;
+  --primary: #b3d33b;
+  --primary-foreground: #1c1b1b;
+  --secondary: #ff5da2;
+  --secondary-foreground: #1c1b1b;
+  --muted: #454936;
+  --muted-foreground: #c5c9b0;
+  --accent: #536600;
+  --accent-foreground: #d9fb5f;
+  --destructive: #ffdad6;
+  --border: #f3f0ef;
+  --input: #313030;
+  --ring: #b3d33b;
+  --chart-1: #b3d33b;
+  --chart-2: #ff5da2;
+  --chart-3: #aec6ff;
+  --chart-4: #536600;
+  --chart-5: #f3f0ef;
+  --sidebar: #313030;
+  --sidebar-foreground: #f3f0ef;
+  --sidebar-primary: #b3d33b;
+  --sidebar-primary-foreground: #1c1b1b;
+  --sidebar-accent: #536600;
+  --sidebar-accent-foreground: #d9fb5f;
+  --sidebar-border: #f3f0ef;
+  --sidebar-ring: #b3d33b;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    /* Polished Grit: 2px borders, 0px radius */
+    border-width: 2px;
+    border-radius: 0px;
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "ss01", "cv01";
+    font-family: var(--font-body), system-ui, sans-serif;
+    /* Grit texture: subtle noise overlay */
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(28, 27, 27, 0.03) 1px, transparent 0);
+    background-size: 4px 4px;
   }
 }
 
-/* ── DowgNut graffiti utilities ─────────────────────────── */
+/* ── Polished Grit Utilities ─────────────────────────── */
 @layer utilities {
-  .glass-card {
-    background: rgba(255, 249, 232, 0.6);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 1.5rem;
-    box-shadow: 0 8px 32px rgba(7, 51, 79, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  /* Hard shadow — no blur, solid black offset */
+  .hard-shadow {
+    box-shadow: 4px 4px 0px 0px #1c1b1b;
   }
-  .dark .glass-card {
-    background: rgba(7, 51, 79, 0.6);
-    border: 1px solid rgba(232, 248, 102, 0.15);
+  .hard-shadow-lg {
+    box-shadow: 8px 8px 0px 0px #1c1b1b;
   }
+  .hard-shadow-sm {
+    box-shadow: 2px 2px 0px 0px #1c1b1b;
+  }
+  .dark .hard-shadow {
+    box-shadow: 4px 4px 0px 0px #f3f0ef;
+  }
+  .dark .hard-shadow-lg {
+    box-shadow: 8px 8px 0px 0px #f3f0ef;
+  }
+  .dark .hard-shadow-sm {
+    box-shadow: 2px 2px 0px 0px #f3f0ef;
+  }
+
+  /* Grit border — 2px solid charcoal */
+  .grit-border {
+    border: 2px solid #1c1b1b;
+  }
+  .dark .grit-border {
+    border: 2px solid #f3f0ef;
+  }
+
+  /* Polished Grit card — 2px border + hard shadow + 0px radius */
+  .grit-card {
+    border: 2px solid #1c1b1b;
+    border-radius: 0px;
+    box-shadow: 4px 4px 0px 0px #1c1b1b;
+    background: #ffffff;
+  }
+  .dark .grit-card {
+    border: 2px solid #f3f0ef;
+    box-shadow: 4px 4px 0px 0px #f3f0ef;
+    background: #313030;
+  }
+
+  /* Polished Grit button — hover lift effect */
+  .grit-btn {
+    border: 2px solid #1c1b1b;
+    border-radius: 0px;
+    box-shadow: 4px 4px 0px 0px #1c1b1b;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+  .grit-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px 0px #1c1b1b;
+  }
+  .grit-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0px 0px #1c1b1b;
+  }
+  .dark .grit-btn {
+    border: 2px solid #f3f0ef;
+    box-shadow: 4px 4px 0px 0px #f3f0ef;
+  }
+  .dark .grit-btn:hover {
+    box-shadow: 6px 6px 0px 0px #f3f0ef;
+  }
+
+  /* Display font — Anybody */
   .graffiti-text {
-    font-family: var(--font-display), var(--font-geist-sans), system-ui, sans-serif;
+    font-family: var(--font-display), system-ui, sans-serif;
     font-weight: 900;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.04em;
     text-transform: uppercase;
-    line-height: 0.9;
+    line-height: 1.0;
   }
+
+  /* Mono label — JetBrains Mono */
+  .mono-label {
+    font-family: var(--font-mono), monospace;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  /* Brand stroke — keeps legacy compatibility */
   .brand-stroke {
-    -webkit-text-stroke: 2px #07334f;
+    -webkit-text-stroke: 2px #1c1b1b;
     paint-order: stroke fill;
   }
+
+  /* Drip shadow — hard, no blur */
   .drip-shadow {
-    filter: drop-shadow(0 6px 0 rgba(7, 51, 79, 0.18));
+    filter: drop-shadow(0 4px 0 rgba(28, 27, 27, 0.2));
   }
+
+  /* Lime grid background */
   .lime-bg-grid {
     background-image:
-      radial-gradient(circle at 1px 1px, rgba(7, 51, 79, 0.08) 1px, transparent 0);
+      radial-gradient(circle at 1px 1px, rgba(28, 27, 27, 0.06) 1px, transparent 0);
     background-size: 22px 22px;
   }
+
+  /* Scrollbar — sharp, no radius */
   .scrollbar-dowgnut::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -179,15 +270,15 @@
     background: transparent;
   }
   .scrollbar-dowgnut::-webkit-scrollbar-thumb {
-    background: #07579b55;
-    border-radius: 999px;
-    border: 2px solid transparent;
-    background-clip: content-box;
+    background: #536600;
+    border-radius: 0px;
+    border: 2px solid #1c1b1b;
   }
   .scrollbar-dowgnut::-webkit-scrollbar-thumb:hover {
-    background: #07579b99;
-    background-clip: content-box;
+    background: #1c1b1b;
   }
+
+  /* Animations */
   .animate-float {
     animation: dowgnut-float 4s ease-in-out infinite;
   }
@@ -196,6 +287,19 @@
   }
   .animate-wiggle {
     animation: dowgnut-wiggle 1.2s ease-in-out infinite;
+  }
+
+  /* Legacy glass-card (kept for components that still use it) */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #1c1b1b;
+    border-radius: 0px;
+    box-shadow: 4px 4px 0px 0px #1c1b1b;
+  }
+  .dark .glass-card {
+    background: rgba(49, 48, 48, 0.9);
+    border: 2px solid #f3f0ef;
+    box-shadow: 4px 4px 0px 0px #f3f0ef;
   }
 }
 
