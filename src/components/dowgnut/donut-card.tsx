@@ -57,7 +57,8 @@ export function DonutCard({ donut }: DonutCardProps) {
         celebrateFavorite(target);
         playFavorite();
       }
-    } catch {
+    } catch (error) {
+      console.error("Failed to toggle favorite:", error);
       toast({
         title: "Couldn't update favorites",
         description: "Please try again",
@@ -79,7 +80,8 @@ export function DonutCard({ donut }: DonutCardProps) {
       });
       celebrateAddToCart(e.currentTarget as HTMLElement, donut.imgUrl);
       playAddToCart();
-    } catch {
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
       toast({ 
         title: "Couldn't add to cart", 
         description: "Please try again",

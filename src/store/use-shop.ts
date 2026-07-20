@@ -178,7 +178,8 @@ export const useShop = create<ShopState>()(
           const url = buildDonutsUrl(get());
           const data = await apiFetch<Donut[]>(url);
           set({ donuts: data || [] });
-        } catch {
+        } catch (error) {
+          console.error("Failed to load donuts:", error);
           set({ donuts: [] });
         } finally {
           set({ loadingDonuts: false });
@@ -192,7 +193,8 @@ export const useShop = create<ShopState>()(
             `/api/donuts/${donut.id}`
           );
           set({ selectedDonut: data.donut, detailReviews: data.reviews || [] });
-        } catch {
+        } catch (error) {
+          console.error("Failed to load donut details:", error);
           // keep the originally passed donut
         } finally {
           set({ detailLoading: false });
@@ -205,8 +207,8 @@ export const useShop = create<ShopState>()(
             `/api/donuts/${donutId}`
           );
           set({ detailReviews: data.reviews || [], selectedDonut: data.donut });
-        } catch {
-          /* noop */
+        } catch (error) {
+          console.error("Failed to load reviews:", error);
         }
       },
       addReview: async (donutId, payload) => {
@@ -222,7 +224,8 @@ export const useShop = create<ShopState>()(
         try {
           const data = await apiFetch<CartItem[]>(`/api/cart`);
           set({ cart: data || [] });
-        } catch {
+        } catch (error) {
+          console.error("Failed to load cart:", error);
           set({ cart: [] });
         } finally {
           set({ cartLoading: false });
@@ -235,8 +238,8 @@ export const useShop = create<ShopState>()(
             body: JSON.stringify({ donutId, quantity }),
           });
           set({ cart: data || [] });
-        } catch {
-          /* toast handled by caller */
+        } catch (error) {
+          console.error("Failed to add to cart:", error);
           throw new Error("Failed to add to cart");
         }
       },
@@ -247,8 +250,8 @@ export const useShop = create<ShopState>()(
             body: JSON.stringify({ quantity }),
           });
           set({ cart: data || [] });
-        } catch {
-          /* noop */
+        } catch (error) {
+          console.error("Failed to update cart quantity:", error);
         }
       },
       removeFromCart: async (cartItemId) => {
@@ -257,8 +260,8 @@ export const useShop = create<ShopState>()(
             method: "DELETE",
           });
           set({ cart: data || [] });
-        } catch {
-          /* noop */
+        } catch (error) {
+          console.error("Failed to remove from cart:", error);
         }
       },
       clearCart: async () => {
@@ -272,7 +275,8 @@ export const useShop = create<ShopState>()(
         try {
           const data = await apiFetch<Favorite[]>(`/api/favorites`);
           set({ favorites: data || [] });
-        } catch {
+        } catch (error) {
+          console.error("Failed to load favorites:", error);
           set({ favorites: [] });
         }
       },
@@ -291,8 +295,8 @@ export const useShop = create<ShopState>()(
             });
             set({ favorites: data || [] });
           }
-        } catch {
-          /* noop */
+        } catch (error) {
+          console.error("Failed to toggle favorite:", error);
         }
       },
       isFavorite: (donutId) =>
@@ -313,7 +317,8 @@ export const useShop = create<ShopState>()(
           const data = await apiFetch<Order[]>(`/api/orders?sessionId=${encodeURIComponent(sid)}`);
           set({ orders: data || [] });
           return data || [];
-        } catch {
+        } catch (error) {
+          console.error("Failed to load orders:", error);
           return [];
         }
       },
@@ -346,12 +351,12 @@ export const useShop = create<ShopState>()(
         splashDone: s.splashDone,
       }),
       onRehydrateStorage: () => (state) => {
-        // Restore sessionId into localStorage so apiFetch can read it
+        // Restore sessionId into sessionStorage so apiFetch can read it
         if (state?.sessionId) {
           try {
-            localStorage.setItem(SESSION_KEY, state.sessionId);
-          } catch {
-            /* ignore */
+            sessionStorage.setItem(SESSION_KEY, state.sessionId);
+          } catch (error) {
+            console.error("Failed to restore session:", error);
           }
         }
       },

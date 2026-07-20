@@ -44,7 +44,8 @@ export function CartDrawer() {
         title: "Cart cleared", 
         description: "Your box is empty now" 
       });
-    } catch {
+    } catch (error) {
+      console.error("Failed to clear cart:", error);
       toast({ 
         title: "Couldn't clear cart", 
         description: "Please try again", 
@@ -56,7 +57,8 @@ export function CartDrawer() {
   const handleUpdateQty = async (itemId: string, newQty: number) => {
     try {
       await updateCartQty(itemId, newQty);
-    } catch {
+    } catch (error) {
+      console.error("Failed to update quantity:", error);
       toast({
         title: "Couldn't update quantity",
         description: "Please try again",
@@ -72,7 +74,8 @@ export function CartDrawer() {
         title: "Removed from cart",
         description: `${itemName} removed`,
       });
-    } catch {
+    } catch (error) {
+      console.error("Failed to remove item:", error);
       toast({
         title: "Couldn't remove item",
         description: "Please try again",

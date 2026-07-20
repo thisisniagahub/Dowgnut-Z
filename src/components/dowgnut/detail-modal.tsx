@@ -80,7 +80,8 @@ export function DetailModal() {
         closeDetail();
         setCartOpen(true);
       }
-    } catch {
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
       toast({
         title: "Couldn't add to cart",
         description: "Please try again.",
@@ -90,11 +91,20 @@ export function DetailModal() {
   };
 
   const onFav = async () => {
-    await toggleFavorite(donut.id);
-    toast({
-      title: fav ? "Removed from favorites" : "Saved to favorites",
-      description: donut.name,
-    });
+    try {
+      await toggleFavorite(donut.id);
+      toast({
+        title: fav ? "Removed from favorites" : "Saved to favorites",
+        description: donut.name,
+      });
+    } catch (error) {
+      console.error("Failed to toggle favorite:", error);
+      toast({
+        title: "Couldn't update favorites",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const onReview = async () => {
@@ -117,7 +127,8 @@ export function DetailModal() {
       setComment("");
       setRating("5");
       toast({ title: "Thanks for the review!", description: donut.name });
-    } catch {
+    } catch (error) {
+      console.error("Failed to post review:", error);
       toast({
         title: "Couldn't post review",
         description: "Please try again.",

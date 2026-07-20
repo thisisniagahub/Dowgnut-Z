@@ -261,7 +261,8 @@ export function SwipeView() {
               title: SUCCESS_MESSAGES.favorite, 
               description: `${donut.name} saved to favorites` 
             });
-          } catch {
+          } catch (error) {
+            console.error("Failed to save favorite:", error);
             toast({
               title: "Couldn't save to favorites",
               description: "Please try again",
@@ -279,7 +280,8 @@ export function SwipeView() {
             title: SUCCESS_MESSAGES.addToCart,
             description: `${donut.name} × 1`,
           });
-        } catch {
+        } catch (error) {
+          console.error("Failed to add to cart:", error);
           toast({
             title: "Couldn't add to cart",
             description: "Please try again.",
