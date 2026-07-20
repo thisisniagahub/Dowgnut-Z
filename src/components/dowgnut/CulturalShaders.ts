@@ -211,9 +211,6 @@ export function createFestivalGlazeMaterial(festival: FestivalKey) {
         #include <colorspace_fragment>
       }
     `,
-    extensions: {
-      derivatives: true,
-    },
   });
 }
 
@@ -365,7 +362,7 @@ export function getCurrentFestival(): FestivalKey | null {
   // Deepavali: ~Oct-Nov
   
   if (month === 7 && day === 31) return "merdeka"; // Aug 31
-  if (month === 3 || month === 4) return "harir Raya"; // Apr-May
+  if (month === 3 || month === 4) return "harirRaya"; // Mar-Apr (~Hari Raya varies)
   if (month === 0 || month === 1) return "cny"; // Jan-Feb
   if (month === 9 || month === 10) return "deepavali"; // Oct-Nov
   

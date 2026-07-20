@@ -1,4 +1,4 @@
-import NextAuth from "next-auth";
+import NextAuth, { type NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { db } from "@/lib/db";
@@ -27,7 +27,7 @@ declare module "next-auth/jwt" {
   }
 }
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
   providers: [
     CredentialsProvider({
@@ -91,4 +91,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
-});
+};
+
+// NextAuth v4 App Router pattern: wrap a default export of the handler
+// and re-export as named GET/POST for App Router segment config.
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };

@@ -17,16 +17,9 @@ export type SeedDonut = {
   featured: boolean;
 };
 
-const BASE = "https://romanejaquez.github.io/flutter-codelab4/assets";
-
-const img = (folder: string, n: number) =>
-  `${BASE}/${folder}/${
-    folder === "donutclassic"
-      ? "donut_classic"
-      : folder === "donutsprinkled"
-        ? "donut_sprinkled"
-        : "donut_stuffed"
-  }${n}.png`;
+const img = (folder: string, n: number) => {
+  return `/donuts/donut-${((n - 1) % 5) + 1}.png`;
+};
 
 export const SEED_DONUTS: SeedDonut[] = [
   // ── Classic (5) ─────────────────────────────────────────────

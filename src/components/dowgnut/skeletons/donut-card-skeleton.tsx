@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 
 interface DonutCardSkeletonProps {
   className?: string;
+  size?: number;
 }
 
 export function DonutCardSkeleton({ className }: DonutCardSkeletonProps) {

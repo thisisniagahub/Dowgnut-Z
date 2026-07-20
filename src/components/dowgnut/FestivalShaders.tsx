@@ -2,13 +2,14 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-type FestivalKey = "harir Raya" | "merdeka" | "cny" | "deepavali" | null;
+type FestivalKey = "harirRaya" | "merdeka" | "cny" | "deepavali" | null;
 
 interface FestivalContextType {
   currentFestival: FestivalKey;
   setFestival: (festival: FestivalKey) => void;
   isFestivalMode: boolean;
   autoDetect: () => FestivalKey;
+  autoDetected: FestivalKey;
 }
 
 const FestivalContext = createContext<FestivalContextType | undefined>(undefined);
@@ -27,7 +28,7 @@ export function FestivalProvider({ children }: { children: ReactNode }) {
     // 2025: March 30-31, 2026: March 19-20
     // Check if within ~10 days of expected dates
     if ((month === 2 && day >= 20) || (month === 3 && day <= 10)) {
-      return "harir Raya";
+      return "harirRaya";
     }
     
     // Merdeka: August 31
@@ -90,6 +91,7 @@ export function FestivalProvider({ children }: { children: ReactNode }) {
         setFestival,
         isFestivalMode: !!currentFestival,
         autoDetect,
+        autoDetected,
       }}
     >
       {children}
@@ -113,7 +115,7 @@ export function FestivalToggle() {
   const { currentFestival, setFestival, isFestivalMode, autoDetected } = useFestival();
   
   const festivals = [
-    { key: "harir Raya" as const, label: "Hari Raya", emoji: "🌙", color: "bg-green-600" },
+    { key: "harirRaya" as const, label: "Hari Raya", emoji: "🌙", color: "bg-green-600" },
     { key: "merdeka" as const, label: "Merdeka", emoji: "🇲🇾", color: "bg-red-600" },
     { key: "cny" as const, label: "CNY", emoji: "🧧", color: "bg-red-500" },
     { key: "deepavali" as const, label: "Deepavali", emoji: "🪔", color: "bg-purple-600" },
@@ -219,14 +221,14 @@ export function FestivalBanner() {
   if (!currentFestival) return null;
 
   const greetings: Record<string, string> = {
-    "harir Raya": "Selamat Hari Raya Aidilfitri! Maaf Zahir & Batin 🌙",
+    "harirRaya": "Selamat Hari Raya Aidilfitri! Maaf Zahir & Batin 🌙",
     "merdeka": "Merdeka! Merdeka! Merdeka! 🇲🇾",
     "cny": "Gong Xi Fa Cai! 新年快乐 🧧",
     "deepavali": "Happy Deepavali! Selamat Hari Deepavali! 🪔",
   };
 
   const colors: Record<string, string> = {
-    "harir Raya": "from-green-600 via-emerald-500 to-yellow-400",
+    "harirRaya": "from-green-600 via-emerald-500 to-yellow-400",
     "merdeka": "from-red-600 via-white to-blue-800",
     "cny": "from-red-600 via-yellow-400 to-orange-500",
     "deepavali": "from-purple-700 via-orange-500 to-pink-500",
@@ -249,7 +251,7 @@ export function FestivalBanner() {
           transition={{ duration: 2, repeat: Infinity }}
           className="text-2xl"
         >
-          {currentFestival === "harir Raya" && "🌙"}
+          {currentFestival === "harirRaya" && "🌙"}
           {currentFestival === "merdeka" && "🇲🇾"}
           {currentFestival === "cny" && "🧧"}
           {currentFestival === "deepavali" && "🪔"}
@@ -262,7 +264,7 @@ export function FestivalBanner() {
           transition={{ duration: 2, repeat: Infinity }}
           className="text-2xl"
         >
-          {currentFestival === "harir Raya" && "🌙"}
+          {currentFestival === "harirRaya" && "🌙"}
           {currentFestival === "merdeka" && "🇲🇾"}
           {currentFestival === "cny" && "🧧"}
           {currentFestival === "deepavali" && "🪔"}

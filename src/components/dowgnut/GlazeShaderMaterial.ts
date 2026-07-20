@@ -137,9 +137,6 @@ export function createGlazeShaderMaterial(params: {
         #include <colorspace_fragment>
       }
     `,
-    extensions: {
-      derivatives: true,
-    },
   });
 }
 

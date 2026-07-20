@@ -1,11 +1,15 @@
 // DowgNut — Prisma schema for advanced donut e-commerce
-// SQLite datasource (ephemeral /tmp on Vercel) (Vercel Postgres / Neon / Supabase)
+// SQLite (local dev) → PostgreSQL (Vercel Postgres / Neon / Supabase) for production.
+// Pick the provider via `DATABASE_URL` and `prisma db push` — see docs/DEPLOY.md.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
+  // For development: keep provider = "sqlite", URL = "file:./db/custom.db"
+  // For production (Vercel/Neon/Supabase): flip to "postgresql" and
+  // point DATABASE_URL at the production cluster.
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }

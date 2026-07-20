@@ -56,8 +56,7 @@ export async function POST(request: Request) {
                 tokenBuffer += token;
                 const data = JSON.stringify({ type: "token", token });
                 controller.enqueue(encoder.encode(`data: ${data}\n\n`));
-              },
-              { stream: true }
+              }
             );
           } catch (err: any) {
             const errorData = JSON.stringify({

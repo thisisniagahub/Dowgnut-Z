@@ -29,7 +29,7 @@ export function SearchBar() {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
-  const debounceRef = useRef<NodeJS.Timeout>();
+  const debounceRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   // Build search results
   const buildResults = useCallback(
@@ -73,7 +73,7 @@ export function SearchBar() {
         }
 
         // Search in tags
-        const tags = donut.tags?.split(",").map((t) => t.trim()) || [];
+        const tags = (donut.tags || []).map((t) => t.trim());
         for (const tag of tags) {
           if (tag.toLowerCase().includes(lowerQuery)) {
             matches.push({

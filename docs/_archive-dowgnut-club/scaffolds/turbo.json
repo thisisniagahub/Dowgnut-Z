@@ -1,0 +1,23 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {},
+    "typecheck": {},
+    "db:migrate": {
+      "dependsOn": ["db:generate"]
+    },
+    "db:generate": {
+      "outputs": ["prisma/migrations/**"]
+    },
+    "db:seed": {}
+  },
+  "globalEnv": ["DATABASE_URL", "REDIS_URL", "JWT_SECRET"]
+}

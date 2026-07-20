@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { order_id, status, trans_id, paid_amount } = payload;
+    const { order_id, status, trans_id, paid_amount } = payload as Record<string, string>;
 
     // Update order status
     if (status === "success") {

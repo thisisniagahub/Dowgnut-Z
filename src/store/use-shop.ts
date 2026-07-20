@@ -111,6 +111,11 @@ interface ShopState {
 
   aiConcierge: (messages: ChatMessage[]) => Promise<{ reply: string; donuts: Donut[] }>;
   aiDesigner: (prompt: string) => Promise<{ imageUrl: string }>;
+
+  // tapau physics trigger
+  triggerTapau: (donut: Donut) => Promise<void>;
+  clearTapauTrigger: () => void;
+  setTapauTrigger: (trigger: { donut: Donut; resolve: () => void } | null) => void;
 }
 
 function buildDonutsUrl(state: ShopState): string {
